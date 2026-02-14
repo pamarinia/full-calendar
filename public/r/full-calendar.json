@@ -39,11 +39,11 @@
     "toggle",
     "tooltip",
     "tabs",
-    "https://calendar.jeraidi.tech/r/avatar-group.json",
-    "https://calendar.jeraidi.tech/r/day-picker.json",
-    "https://calendar.jeraidi.tech/r/date-time-picker.json",
-    "https://calendar.jeraidi.tech/r/responsive-modal.json",
-    "https://calendar.jeraidi.tech/r/button-group.json"
+    "https://calendar.jeraidi.dev/r/avatar-group.json",
+    "https://calendar.jeraidi.dev/r/day-picker.json",
+    "https://calendar.jeraidi.dev/r/date-time-picker.json",
+    "https://calendar.jeraidi.dev/r/responsive-modal.json",
+    "https://calendar.jeraidi.dev/r/button-group.json"
   ],
   "files": [
     {
