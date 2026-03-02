@@ -1,9 +1,7 @@
 ---
-
 title: Installation
 description: How to install and set up the calendar application in your project using the custom ShadCN UI registry
 icon: Rocket
-
 ---
 
 Use your preferred package manager to install the calendar component directly from the custom ShadCN UI registry:
@@ -18,8 +16,8 @@ Inside your `app/page.tsx`:
 
 ```tsx
 import React, { Suspense } from "react";
-import { Calendar } from "@/components/calendar/calendar";
-import { CalendarSkeleton } from "@/components/calendar/skeletons/calendar-skeleton";
+import { Calendar } from "../../components/calendar/calendar";
+import { CalendarSkeleton } from "../../components/calendar/skeletons/calendar-skeleton";
 
 export default function CalendarPage() {
   return (

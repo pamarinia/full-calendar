@@ -32,8 +32,8 @@ Import and use the `Calendar` component in your page:
 
 ```tsx
 import React, { Suspense } from "react";
-import { Calendar } from "@/features/calendar/calendar";
-import { CalendarSkeleton } from "@/features/calendar/skeletons/calendar-skeleton";
+import { Calendar } from "../calendar";
+import { CalendarSkeleton } from "../skeletons/calendar-skeleton";
 
 export default function CalendarPage() {
   return (
@@ -60,7 +60,7 @@ export default function CalendarPage() {
 Here's an overview of the important files and directories in the project:
 
 ```
-src/
+../../
 ├── features/
 │   └── calendar/
 │       ├── calendar.tsx          # Main entry point component. Fetches data and wraps the app in providers.
@@ -81,14 +81,17 @@ src/
 The project is architected around a central context provider that manages the state of the calendar. Here is the high-level flow:
 
 1.  **Initialization**:
-    - The `Calendar` component (`src/components/calendar/calendar.tsx`) serves as the entry point.
+
+    - The `Calendar` component (`../../components/calendar/calendar.tsx`) serves as the entry point.
     - It fetches initial data (events and users) and initializes the `CalendarProvider`.
 
 2.  **State Management**:
+
     - `CalendarContext` holds the application state, including the current view (Day, Week, Month, etc.), selected date, list of events, and active filters.
     - It uses `localStorage` to persist user preferences such as the preferred view, time format (12h/24h), and badge styles.
 
 3.  **Rendering Logic**:
+
     - The `CalendarHeader` allows users to navigate dates, switch views, and apply filters.
     - The `CalendarBody` listens to the `view` state from the context and dynamically renders the appropriate view component (e.g., `MonthView`, `WeekView`).
 

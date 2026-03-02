@@ -17,7 +17,7 @@
       ],
       "files": [
         {
-          "path": "src/components/ui/date-time-picker.tsx",
+          "path": "../../components/ui/date-time-picker.tsx",
           "type": "registry:component"
         }
       ]
@@ -32,7 +32,7 @@
       ],
       "files": [
         {
-          "path": "src/components/ui/avatar-group.tsx",
+          "path": "../../components/ui/avatar-group.tsx",
           "type": "registry:component"
         }
       ]
@@ -47,7 +47,7 @@
       ],
       "files": [
         {
-          "path": "src/components/ui/responsive-modal.tsx",
+          "path": "../../components/ui/responsive-modal.tsx",
           "type": "registry:component"
         }
       ]
@@ -66,7 +66,7 @@
       ],
       "files": [
         {
-          "path": "src/components/ui/day-picker.tsx",
+          "path": "../../components/ui/day-picker.tsx",
           "type": "registry:component"
         }
       ]
@@ -81,7 +81,7 @@
       ],
       "files": [
         {
-          "path": "src/components/ui/button-group.tsx",
+          "path": "../../components/ui/button-group.tsx",
           "type": "registry:component"
         }
       ]
@@ -134,187 +134,187 @@
       ],
       "files": [
         {
-          "path": "src/features/calendar/contexts/calendar-context.tsx",
+          "path": "../../features/calendar/contexts/calendar-context.tsx",
           "type": "registry:component"
         },
         {
-          "path": "src/features/calendar/contexts/dnd-context.tsx",
+          "path": "../../features/calendar/contexts/dnd-context.tsx",
           "type": "registry:component"
         },
         {
-          "path": "src/features/calendar/dialogs/add-edit-event-dialog.tsx",
+          "path": "../../features/calendar/dialogs/add-edit-event-dialog.tsx",
           "type": "registry:component"
         },
         {
-          "path": "src/features/calendar/dialogs/delete-event-dialog.tsx",
+          "path": "../../features/calendar/dialogs/delete-event-dialog.tsx",
           "type": "registry:component"
         },
         {
-          "path": "src/features/calendar/dialogs/event-details-dialog.tsx",
+          "path": "../../features/calendar/dialogs/event-details-dialog.tsx",
           "type": "registry:component"
         },
         {
-          "path": "src/features/calendar/dialogs/events-list-dialog.tsx",
+          "path": "../../features/calendar/dialogs/events-list-dialog.tsx",
           "type": "registry:component"
         },
         {
-          "path": "src/features/calendar/dnd/draggable-event.tsx",
+          "path": "../../features/calendar/dnd/draggable-event.tsx",
           "type": "registry:component"
         },
         {
-          "path": "src/features/calendar/dnd/droppable-area.tsx",
+          "path": "../../features/calendar/dnd/droppable-area.tsx",
           "type": "registry:component"
         },
         {
-          "path": "src/features/calendar/dnd/resizable-event.tsx",
+          "path": "../../features/calendar/dnd/resizable-event.tsx",
           "type": "registry:component"
         },
         {
-          "path": "src/features/calendar/header/calendar-header.tsx",
+          "path": "../../features/calendar/header/calendar-header.tsx",
           "type": "registry:component"
         },
         {
-          "path": "src/features/calendar/header/view-tabs.tsx",
+          "path": "../../features/calendar/header/view-tabs.tsx",
           "type": "registry:component"
         },
         {
-          "path": "src/features/calendar/header/date-navigator.tsx",
+          "path": "../../features/calendar/header/date-navigator.tsx",
           "type": "registry:component"
         },
         {
-          "path": "src/features/calendar/header/filter.tsx",
+          "path": "../../features/calendar/header/filter.tsx",
           "type": "registry:component"
         },
         {
-          "path": "src/features/calendar/header/today-button.tsx",
+          "path": "../../features/calendar/header/today-button.tsx",
           "type": "registry:component"
         },
         {
-          "path": "src/features/calendar/header/user-select.tsx",
+          "path": "../../features/calendar/header/user-select.tsx",
           "type": "registry:component"
         },
         {
-          "path": "src/features/calendar/settings/settings.tsx",
+          "path": "../../features/calendar/settings/settings.tsx",
           "type": "registry:component"
         },
         {
-          "path": "src/features/calendar/skeletons/calendar-header-skeleton.tsx",
+          "path": "../../features/calendar/skeletons/calendar-header-skeleton.tsx",
           "type": "registry:component"
         },
         {
-          "path": "src/features/calendar/skeletons/calendar-skeleton.tsx",
+          "path": "../../features/calendar/skeletons/calendar-skeleton.tsx",
           "type": "registry:component"
         },
         {
-          "path": "src/features/calendar/skeletons/day-view-skeleton.tsx",
+          "path": "../../features/calendar/skeletons/day-view-skeleton.tsx",
           "type": "registry:component"
         },
         {
-          "path": "src/features/calendar/skeletons/month-view-skeleton.tsx",
+          "path": "../../features/calendar/skeletons/month-view-skeleton.tsx",
           "type": "registry:component"
         },
         {
-          "path": "src/features/calendar/skeletons/week-view-skeleton.tsx",
+          "path": "../../features/calendar/skeletons/week-view-skeleton.tsx",
           "type": "registry:component"
         },
         {
-          "path": "src/features/calendar/skeletons/year-view-skeleton.tsx",
+          "path": "../../features/calendar/skeletons/year-view-skeleton.tsx",
           "type": "registry:component"
         },
         {
-          "path": "src/features/calendar/views/agenda-view/agenda-events.tsx",
+          "path": "../../features/calendar/views/agenda-view/agenda-events.tsx",
           "type": "registry:component"
         },
         {
-          "path": "src/features/calendar/views/month-view/calendar-month-view.tsx",
+          "path": "../../features/calendar/views/month-view/calendar-month-view.tsx",
           "type": "registry:component"
         },
         {
-          "path": "src/features/calendar/views/month-view/day-cell.tsx",
+          "path": "../../features/calendar/views/month-view/day-cell.tsx",
           "type": "registry:component"
         },
         {
-          "path": "src/features/calendar/views/month-view/event-bullet.tsx",
+          "path": "../../features/calendar/views/month-view/event-bullet.tsx",
           "type": "registry:component"
         },
         {
-          "path": "src/features/calendar/views/month-view/month-event-badge.tsx",
+          "path": "../../features/calendar/views/month-view/month-event-badge.tsx",
           "type": "registry:component"
         },
         {
-          "path": "src/features/calendar/views/week-and-day-view/calendar-day-view.tsx",
+          "path": "../../features/calendar/views/week-and-day-view/calendar-day-view.tsx",
           "type": "registry:component"
         },
         {
-          "path": "src/features/calendar/views/week-and-day-view/calendar-time-line.tsx",
+          "path": "../../features/calendar/views/week-and-day-view/calendar-time-line.tsx",
           "type": "registry:component"
         },
         {
-          "path": "src/features/calendar/views/week-and-day-view/calendar-week-view.tsx",
+          "path": "../../features/calendar/views/week-and-day-view/calendar-week-view.tsx",
           "type": "registry:component"
         },
         {
-          "path": "src/features/calendar/views/week-and-day-view/day-view-multi-day-events-row.tsx",
+          "path": "../../features/calendar/views/week-and-day-view/day-view-multi-day-events-row.tsx",
           "type": "registry:component"
         },
         {
-          "path": "src/features/calendar/views/week-and-day-view/event-block.tsx",
+          "path": "../../features/calendar/views/week-and-day-view/event-block.tsx",
           "type": "registry:component"
         },
         {
-          "path": "src/features/calendar/views/week-and-day-view/render-grouped-events.tsx",
+          "path": "../../features/calendar/views/week-and-day-view/render-grouped-events.tsx",
           "type": "registry:component"
         },
         {
-          "path": "src/features/calendar/views/week-and-day-view/week-view-multi-day-events-row.tsx",
+          "path": "../../features/calendar/views/week-and-day-view/week-view-multi-day-events-row.tsx",
           "type": "registry:component"
         },
         {
-          "path": "src/features/calendar/views/year-view/calendar-year-view.tsx",
+          "path": "../../features/calendar/views/year-view/calendar-year-view.tsx",
           "type": "registry:component"
         },
         {
-          "path": "src/features/calendar/calendar.tsx",
+          "path": "../../features/calendar/calendar.tsx",
           "type": "registry:component"
         },
         {
-          "path": "src/features/calendar/calendar-body.tsx",
+          "path": "../../features/calendar/calendar-body.tsx",
           "type": "registry:component"
         },
         {
-          "path": "src/features/calendar/constants.ts",
+          "path": "../../features/calendar/constants.ts",
           "type": "registry:component"
         },
         {
-          "path": "src/features/calendar/animations.ts",
+          "path": "../../features/calendar/animations.ts",
           "type": "registry:component"
         },
         {
-          "path": "src/features/calendar/helpers.ts",
+          "path": "../../features/calendar/helpers.ts",
           "type": "registry:component"
         },
         {
-          "path": "src/features/calendar/hooks.ts",
+          "path": "../../features/calendar/hooks.ts",
           "type": "registry:component"
         },
         {
-          "path": "src/features/calendar/interfaces.ts",
+          "path": "../../features/calendar/interfaces.ts",
           "type": "registry:component"
         },
         {
-          "path": "src/features/calendar/mocks.ts",
+          "path": "../../features/calendar/mocks.ts",
           "type": "registry:component"
         },
         {
-          "path": "src/features/calendar/requests.ts",
+          "path": "../../features/calendar/requests.ts",
           "type": "registry:component"
         },
         {
-          "path": "src/features/calendar/schemas.ts",
+          "path": "../../features/calendar/schemas.ts",
           "type": "registry:component"
         },
         {
-          "path": "src/features/calendar/types.ts",
+          "path": "../../features/calendar/types.ts",
           "type": "registry:component"
         }
       ]
