@@ -17,12 +17,30 @@ interface IEvent {
     user: IUser;
 }
 
+interface AddEventRequest {
+    startDate?: Date;
+    startTime?: {
+        hour: number;
+        minute: number;
+    };
+}
+interface ShowEventRequest {
+    event: IEvent;
+}
+interface ViewDayEventsRequest {
+    date?: Date;
+}
+
 type CalendarProps = {
     events: IEvent[];
     users: IUser[];
+    onEventUpdate?: (event: IEvent) => void;
+    onRequestAddEvent?: (request: AddEventRequest) => void;
+    onRequestShowEvent?: (request: ShowEventRequest) => void;
+    onRequestViewDayEvents?: (request: ViewDayEventsRequest) => void;
 };
-declare function Calendar({ events, users }: CalendarProps): react_jsx_runtime.JSX.Element;
+declare function Calendar({ events, users, onEventUpdate, onRequestAddEvent, onRequestShowEvent, onRequestViewDayEvents, }: CalendarProps): react_jsx_runtime.JSX.Element;
 
 declare function CalendarSkeleton(): react_jsx_runtime.JSX.Element;
 
-export { Calendar, type CalendarProps, CalendarSkeleton, type IEvent, type IUser };
+export { type AddEventRequest, Calendar, type CalendarProps, CalendarSkeleton, type IEvent, type IUser, type ShowEventRequest, type ViewDayEventsRequest };

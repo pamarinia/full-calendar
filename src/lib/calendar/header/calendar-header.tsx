@@ -13,7 +13,6 @@ import {
 
 import { slideFromLeft, slideFromRight, transition } from "../animations";
 import { useCalendar } from "../contexts/calendar-context";
-import { AddEditEventDialog } from "../dialogs/add-edit-event-dialog";
 import { DateNavigator } from "../header/date-navigator";
 import FilterEvents from "../header/filter";
 import { TodayButton } from "../header/today-button";
@@ -23,7 +22,7 @@ import Views from "./view-tabs";
 import { Button } from "../../components/ui/button";
 
 export function CalendarHeader() {
-  const { view, events } = useCalendar();
+  const { view, events, onRequestAddEvent } = useCalendar();
 
   return (
     <div className="flex flex-col gap-4 border-b p-4 lg:flex-row lg:items-center lg:justify-between">
@@ -53,12 +52,10 @@ export function CalendarHeader() {
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:gap-1.5">
           <UserSelect />
 
-          <AddEditEventDialog>
-            <Button>
-              <Plus className="h-4 w-4" />
-              Add Event
-            </Button>
-          </AddEditEventDialog>
+          <Button onClick={() => onRequestAddEvent?.({})}>
+            <Plus className="h-4 w-4" />
+            Add Event
+          </Button>
         </div>
         <Settings />
       </motion.div>

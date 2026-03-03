@@ -7,7 +7,7 @@ import { useMemo, useCallback } from "react";
 
 import { cn } from "../../../utils";
 import { transition } from "../../animations";
-import { EventListDialog } from "../../dialogs/events-list-dialog";
+import { useCalendar } from "../../contexts/calendar-context";
 import { DroppableArea } from "../../dnd/droppable-area";
 import { getMonthCellEvents } from "../../helpers";
 import { useMediaQuery } from "../../hooks";
@@ -16,7 +16,7 @@ import { EventBullet } from "../../views/month-view/event-bullet";
 import { MonthEventBadge } from "../../views/month-view/month-event-badge";
 import { Button } from "../../../components/ui/button";
 import { Plus } from "lucide-react";
-import { AddEditEventDialog } from "../../dialogs/add-edit-event-dialog";
+
 
 interface IProps {
   cell: ICalendarCell;
@@ -50,6 +50,7 @@ const MAX_VISIBLE_EVENTS = 3;
 export function DayCell({ cell, events, eventPositions }: IProps) {
   const { day, currentMonth, date } = cell;
   const isMobile = useMediaQuery("(max-width: 768px)");
+  const { onRequestAddEvent, onRequestViewDayEvents } = useCalendar();
 
   // Memoize cellEvents and currentCellMonth for performance
   const { cellEvents, currentCellMonth } = useMemo(() => {
@@ -137,15 +138,14 @@ export function DayCell({ cell, events, eventPositions }: IProps) {
           >
             {cellEvents.length === 0 && !isMobile ? (
               <div className="w-full h-full flex justify-center items-center group">
-                <AddEditEventDialog startDate={date}>
-                  <Button
-                    variant="ghost"
-                    className="border opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                  >
-                    <Plus className="h-4 w-4" />
-                    <span className="max-sm:hidden">Add Event</span>
-                  </Button>
-                </AddEditEventDialog>
+                <Button
+                  variant="ghost"
+                  className="border opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                  onClick={() => onRequestAddEvent?.({ startDate: date })}
+                >
+                  <Plus className="h-4 w-4" />
+                  <span className="max-sm:hidden">Add Event</span>
+                </Button>
               </div>
             ) : (
               [0, 1, 2].map(renderEventAtPosition)
@@ -170,7 +170,16 @@ export function DayCell({ cell, events, eventPositions }: IProps) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, ...transition }}
             >
-              <EventListDialog date={date} events={cellEvents} />
+              <span
+                className="cursor-pointer"
+                onClick={() => onRequestViewDayEvents?.({ date })}
+              >
+                <span className="sm:hidden">+{showMoreCount}</span>
+                <span className="hidden sm:inline py-0.5 px-2 my-1 rounded-xl border">
+                  {showMoreCount}
+                  <span className="mx-1">more...</span>
+                </span>
+              </span>
             </motion.div>
           )}
         </DroppableArea>
@@ -186,14 +195,16 @@ export function DayCell({ cell, events, eventPositions }: IProps) {
       showMoreCount,
       renderEventAtPosition,
       isMobile,
+      onRequestAddEvent,
+      onRequestViewDayEvents,
     ]
   );
 
   if (isMobile && currentMonth) {
     return (
-      <EventListDialog date={date} events={cellEvents}>
+      <div onClick={() => onRequestViewDayEvents?.({ date })}>
         {cellContent}
-      </EventListDialog>
+      </div>
     );
   }
 

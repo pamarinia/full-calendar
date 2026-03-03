@@ -45,7 +45,7 @@ export function DndProvider({
   children,
   showConfirmation: showConfirmationProp = false,
 }: DndProviderProps) {
-  const { updateEvent } = useCalendar();
+  const { onEventUpdate } = useCalendar();
   const [dragState, setDragState] = useState<{
     draggedEvent: IEvent | null;
     isDragging: boolean;
@@ -168,13 +168,13 @@ export function DndProvider({
           startDate: newStartDate.toISOString(),
           endDate: newEndDate.toISOString(),
         };
-        updateEvent(updatedEvent);
+        onEventUpdate?.(updatedEvent);
         toast.success("Event updated successfully");
       } catch {
         toast.error("Failed to update event");
       }
     },
-    [updateEvent]
+    [onEventUpdate]
   );
 
   // Set default callback

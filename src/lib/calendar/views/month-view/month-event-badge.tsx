@@ -3,7 +3,6 @@ import { cva } from "class-variance-authority";
 import { endOfDay, isSameDay, parseISO, startOfDay } from "date-fns";
 import { cn } from "../../../utils";
 import { useCalendar } from "../../contexts/calendar-context";
-import { EventDetailsDialog } from "../../dialogs/event-details-dialog";
 import { DraggableEvent } from "../../dnd/draggable-event";
 import { formatTime } from "../../helpers";
 import type { IEvent } from "../../interfaces";
@@ -69,7 +68,7 @@ export function MonthEventBadge({
   className,
   position: propPosition,
 }: IProps) {
-  const { badgeVariant, use24HourFormat } = useCalendar();
+  const { badgeVariant, use24HourFormat, onRequestShowEvent } = useCalendar();
 
   const itemStart = startOfDay(parseISO(event.startDate));
   const itemEnd = endOfDay(parseISO(event.endDate));
@@ -112,8 +111,7 @@ export function MonthEventBadge({
 
   return (
     <DraggableEvent event={event} className={marginClass}>
-      <EventDetailsDialog event={event}>
-        <button type="button" className={eventBadgeClasses}>
+        <button type="button" className={eventBadgeClasses} onClick={() => onRequestShowEvent?.({ event })}>
           <div className="flex items-center gap-1.5 truncate">
             {!["middle", "last"].includes(position) &&
               badgeVariant === "dot" && <EventBullet color={event.color} />}
@@ -138,7 +136,6 @@ export function MonthEventBadge({
             )}
           </div>
         </button>
-      </EventDetailsDialog>
     </DraggableEvent>
   );
 }

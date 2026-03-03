@@ -3,7 +3,6 @@ import { motion } from "framer-motion";
 import { cn } from "../../../utils";
 import { staggerContainer, transition } from "../../animations";
 import { useCalendar } from "../../contexts/calendar-context";
-import { EventListDialog } from "../../dialogs/events-list-dialog";
 import { getCalendarCells } from "../../helpers";
 import type { IEvent } from "../../interfaces";
 import { EventBullet } from "../../views/month-view/event-bullet";
@@ -31,7 +30,7 @@ const MONTHS = [
 const WEEKDAYS = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 
 export function CalendarYearView({ singleDayEvents, multiDayEvents }: IProps) {
-  const { selectedDate, setSelectedDate } = useCalendar();
+  const { selectedDate, setSelectedDate, onRequestViewDayEvents } = useCalendar();
   const currentYear = getYear(selectedDate);
   const allEvents = [...multiDayEvents, ...singleDayEvents];
 
@@ -98,8 +97,10 @@ export function CalendarYearView({ singleDayEvents, multiDayEvents }: IProps) {
                       )}
                     >
                       {isCurrentMonth && hasEvents ? (
-                        <EventListDialog date={cell.date} events={dayEvents}>
-                          <div className="w-full h-full flex flex-col items-center justify-start gap-0.5">
+                          <div
+                            className="w-full h-full flex flex-col items-center justify-start gap-0.5"
+                            onClick={() => onRequestViewDayEvents?.({ date: cell.date })}
+                          >
                             <span
                               className={cn(
                                 "size-5 flex items-center justify-center font-medium",
@@ -133,7 +134,6 @@ export function CalendarYearView({ singleDayEvents, multiDayEvents }: IProps) {
                               )}
                             </div>
                           </div>
-                        </EventListDialog>
                       ) : (
                         <div className="w-full h-full flex flex-col items-center justify-start">
                           <span

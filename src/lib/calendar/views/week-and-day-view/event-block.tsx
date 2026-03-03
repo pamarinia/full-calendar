@@ -4,7 +4,6 @@ import { differenceInMinutes, parseISO } from "date-fns";
 import type { HTMLAttributes } from "react";
 import { cn } from "../../../utils";
 import { useCalendar } from "../../contexts/calendar-context";
-import { EventDetailsDialog } from "../../dialogs/event-details-dialog";
 import { DraggableEvent } from "../../dnd/draggable-event";
 import { ResizableEvent } from "../../dnd/resizable-event";
 import { formatTime } from "../../helpers";
@@ -55,7 +54,7 @@ interface IProps
 }
 
 export function EventBlock({ event, className }: IProps) {
-  const { badgeVariant, use24HourFormat } = useCalendar();
+  const { badgeVariant, use24HourFormat, onRequestShowEvent } = useCalendar();
 
   const start = parseISO(event.startDate);
   const end = parseISO(event.endDate);
@@ -74,11 +73,11 @@ export function EventBlock({ event, className }: IProps) {
   return (
     <ResizableEvent event={event}>
       <DraggableEvent event={event}>
-        <EventDetailsDialog event={event}>
           <button
             type="button"
             className={calendarWeekEventCardClasses}
             style={{ height: `${heightInPixels}px` }}
+            onClick={() => onRequestShowEvent?.({ event })}
           >
             <div className="flex items-center gap-1.5 truncate">
               {badgeVariant === "dot" && (
@@ -104,7 +103,6 @@ export function EventBlock({ event, className }: IProps) {
               </p>
             )}
           </button>
-        </EventDetailsDialog>
       </DraggableEvent>
     </ResizableEvent>
   );

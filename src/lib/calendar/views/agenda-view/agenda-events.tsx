@@ -15,7 +15,6 @@ import {
 } from "../../../components/ui/command";
 import { cn } from "../../../utils";
 import { useCalendar } from "../../contexts/calendar-context";
-import { EventDetailsDialog } from "../../dialogs/event-details-dialog";
 import {
   formatTime,
   getBgColor,
@@ -33,6 +32,7 @@ export const AgendaEvents: FC = () => {
     badgeVariant,
     agendaModeGroupBy,
     selectedDate,
+    onRequestShowEvent,
   } = useCalendar();
 
   const monthEvents = getEventsForMonth(events, selectedDate);
@@ -75,8 +75,7 @@ export const AgendaEvents: FC = () => {
                   }
                 )}
               >
-                <EventDetailsDialog event={event}>
-                  <div className="w-full flex items-center justify-between gap-4">
+                  <div className="w-full flex items-center justify-between gap-4 cursor-pointer" onClick={() => onRequestShowEvent?.({ event })}>
                     <div className="flex items-center gap-2">
                       {badgeVariant === "dot" ? (
                         <EventBullet color={event.color} />
@@ -126,7 +125,6 @@ export const AgendaEvents: FC = () => {
                       )}
                     </div>
                   </div>
-                </EventDetailsDialog>
               </CommandItem>
             ))}
           </CommandGroup>

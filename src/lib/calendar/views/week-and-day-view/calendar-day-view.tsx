@@ -4,8 +4,6 @@ import { useEffect, useRef } from "react";
 import { DayPicker } from "../../../components/ui/day-picker";
 import { ScrollArea } from "../../../components/ui/scroll-area";
 import { useCalendar } from "../../contexts/calendar-context";
-
-import { AddEditEventDialog } from "../../dialogs/add-edit-event-dialog";
 import { DroppableArea } from "../../dnd/droppable-area";
 import { groupEvents } from "../../helpers";
 import type { IEvent } from "../../interfaces";
@@ -19,7 +17,7 @@ interface IProps {
 }
 
 export function CalendarDayView({ singleDayEvents, multiDayEvents }: IProps) {
-  const { selectedDate, setSelectedDate, users, use24HourFormat } =
+  const { selectedDate, setSelectedDate, users, use24HourFormat, onRequestAddEvent } =
     useCalendar();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
@@ -138,12 +136,10 @@ export function CalendarDayView({ singleDayEvents, multiDayEvents }: IProps) {
                       minute={0}
                       className="absolute inset-x-0 top-0 h-[48px]"
                     >
-                      <AddEditEventDialog
-                        startDate={selectedDate}
-                        startTime={{ hour, minute: 0 }}
-                      >
-                        <div className="absolute inset-0 cursor-pointer transition-colors hover:bg-secondary" />
-                      </AddEditEventDialog>
+                      <div
+                        className="absolute inset-0 cursor-pointer transition-colors hover:bg-secondary"
+                        onClick={() => onRequestAddEvent?.({ startDate: selectedDate, startTime: { hour, minute: 0 } })}
+                      />
                     </DroppableArea>
 
                     <div className="pointer-events-none absolute inset-x-0 top-1/2 border-b border-dashed border-b-tertiary"></div>
@@ -154,12 +150,10 @@ export function CalendarDayView({ singleDayEvents, multiDayEvents }: IProps) {
                       minute={30}
                       className="absolute inset-x-0 bottom-0 h-[48px]"
                     >
-                      <AddEditEventDialog
-                        startDate={selectedDate}
-                        startTime={{ hour, minute: 30 }}
-                      >
-                        <div className="absolute inset-0 cursor-pointer transition-colors hover:bg-secondary" />
-                      </AddEditEventDialog>
+                      <div
+                        className="absolute inset-0 cursor-pointer transition-colors hover:bg-secondary"
+                        onClick={() => onRequestAddEvent?.({ startDate: selectedDate, startTime: { hour, minute: 30 } })}
+                      />
                     </DroppableArea>
                   </div>
                 ))}

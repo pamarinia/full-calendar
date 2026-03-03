@@ -4,3 +4,4 @@ export type { CalendarProps } from "./calendar/calendar";
 export { CalendarSkeleton } from "./calendar/skeletons/calendar-skeleton";
 
 export type { IEvent, IUser } from "./calendar/interfaces";
+export type { AddEventRequest, ShowEventRequest, ViewDayEventsRequest } from "./calendar/contexts/calendar-context";
