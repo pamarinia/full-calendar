@@ -17,8 +17,13 @@ interface IProps {
 }
 
 export function CalendarDayView({ singleDayEvents, multiDayEvents }: IProps) {
-  const { selectedDate, setSelectedDate, users, use24HourFormat, onRequestAddEvent } =
-    useCalendar();
+  const {
+    selectedDate,
+    setSelectedDate,
+    users,
+    use24HourFormat,
+    onRequestAddEvent,
+  } = useCalendar();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   const hours = Array.from({ length: 24 }, (_, i) => i);
@@ -77,8 +82,8 @@ export function CalendarDayView({ singleDayEvents, multiDayEvents }: IProps) {
   const groupedEvents = groupEvents(dayEvents);
 
   return (
-    <div className="flex">
-      <div className="flex flex-1 flex-col">
+    <div className="flex h-full">
+      <div className="flex flex-1 flex-col min-h-0">
         <div>
           <DayViewMultiDayEventsRow
             selectedDate={selectedDate}
@@ -97,7 +102,7 @@ export function CalendarDayView({ singleDayEvents, multiDayEvents }: IProps) {
           </div>
         </div>
 
-        <ScrollArea className="h-[800px]" type="always" ref={scrollAreaRef}>
+        <div className="flex-1 min-h-0 overflow-y-scroll" ref={scrollAreaRef}>
           <div className="flex">
             {/* Hours column */}
             <div className="relative w-18">
@@ -138,7 +143,12 @@ export function CalendarDayView({ singleDayEvents, multiDayEvents }: IProps) {
                     >
                       <div
                         className="absolute inset-0 cursor-pointer transition-colors hover:bg-secondary"
-                        onClick={() => onRequestAddEvent?.({ startDate: selectedDate, startTime: { hour, minute: 0 } })}
+                        onClick={() =>
+                          onRequestAddEvent?.({
+                            startDate: selectedDate,
+                            startTime: { hour, minute: 0 },
+                          })
+                        }
                       />
                     </DroppableArea>
 
@@ -152,7 +162,12 @@ export function CalendarDayView({ singleDayEvents, multiDayEvents }: IProps) {
                     >
                       <div
                         className="absolute inset-0 cursor-pointer transition-colors hover:bg-secondary"
-                        onClick={() => onRequestAddEvent?.({ startDate: selectedDate, startTime: { hour, minute: 30 } })}
+                        onClick={() =>
+                          onRequestAddEvent?.({
+                            startDate: selectedDate,
+                            startTime: { hour, minute: 30 },
+                          })
+                        }
                       />
                     </DroppableArea>
                   </div>
@@ -167,7 +182,7 @@ export function CalendarDayView({ singleDayEvents, multiDayEvents }: IProps) {
               <CalendarTimeline />
             </div>
           </div>
-        </ScrollArea>
+        </div>
       </div>
 
       <div className="hidden w-72 divide-y border-l md:block">
@@ -188,12 +203,12 @@ export function CalendarDayView({ singleDayEvents, multiDayEvents }: IProps) {
               </span>
 
               <p className="text-sm font-semibold text-t-secondary">
-                Happening now
+                En ce moment
               </p>
             </div>
           ) : (
             <p className="p-4 text-center text-sm italic text-t-tertiary">
-              No appointments or consultations at the moment
+              Aucun rendez-vous en ce moment
             </p>
           )}
 

@@ -28,7 +28,7 @@ interface ShowEventRequest {
     event: IEvent;
 }
 interface ViewDayEventsRequest {
-    date?: Date;
+    date: Date;
 }
 
 type CalendarProps = {
@@ -38,8 +38,10 @@ type CalendarProps = {
     onRequestAddEvent?: (request: AddEventRequest) => void;
     onRequestShowEvent?: (request: ShowEventRequest) => void;
     onRequestViewDayEvents?: (request: ViewDayEventsRequest) => void;
+    disableTimeFormatToggle?: boolean;
+    disableUserManagement?: boolean;
 };
-declare function Calendar({ events, users, onEventUpdate, onRequestAddEvent, onRequestShowEvent, onRequestViewDayEvents, }: CalendarProps): react_jsx_runtime.JSX.Element;
+declare function Calendar({ events, users, onEventUpdate, onRequestAddEvent, onRequestShowEvent, onRequestViewDayEvents, disableTimeFormatToggle, disableUserManagement, }: CalendarProps): react_jsx_runtime.JSX.Element;
 
 declare function CalendarSkeleton(): react_jsx_runtime.JSX.Element;
 

@@ -15,22 +15,22 @@ const tabs = [
     icon: () => <CalendarRange className="h-4 w-4" />,
   },
   {
-    name: "Day",
+    name: "Jour",
     value: "day",
     icon: () => <List className="h-4 w-4" />,
   },
   {
-    name: "Week",
+    name: "Semaine",
     value: "week",
     icon: () => <Columns className="h-4 w-4" />,
   },
   {
-    name: "Month",
+    name: "Mois",
     value: "month",
     icon: () => <Grid3X3 className="h-4 w-4" />,
   },
   {
-    name: "Year",
+    name: "Année",
     value: "year",
     icon: () => <Grid2X2 className="h-4 w-4" />,
   },

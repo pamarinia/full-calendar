@@ -13,21 +13,21 @@ interface IProps {
 }
 
 const MONTHS = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
+  "Janvier",
+  "Février",
+  "Mars",
+  "Avril",
+  "Mai",
+  "Juin",
+  "Juillet",
+  "Août",
+  "Septembre",
+  "Octobre",
+  "Novembre",
+  "Décembre",
 ];
 
-const WEEKDAYS = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+const WEEKDAYS = ["Di", "Lu", "Ma", "Me", "Je", "Ve", "Sa"];
 
 export function CalendarYearView({ singleDayEvents, multiDayEvents }: IProps) {
   const { selectedDate, setSelectedDate, onRequestViewDayEvents } = useCalendar();

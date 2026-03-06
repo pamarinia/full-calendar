@@ -65,7 +65,7 @@ export default function FilterEvents() {
           }}
         >
           <RefreshCcw className="size-3.5" />
-          Clear Filter
+          Effacer le filtre
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

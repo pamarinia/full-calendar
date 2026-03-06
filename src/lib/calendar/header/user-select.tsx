@@ -19,7 +19,7 @@ export function UserSelect() {
   return (
     <Select value={selectedUserId!} onValueChange={filterEventsBySelectedUser}>
       <SelectTrigger className="w-full">
-        <SelectValue placeholder="Select a user" />
+        <SelectValue placeholder="Sélectionner un utilisateur" />
       </SelectTrigger>
       <SelectContent align="end">
         <SelectItem value="all">
@@ -36,7 +36,7 @@ export function UserSelect() {
               </Avatar>
             ))}
           </AvatarGroup>
-          All
+          Tous
         </SelectItem>
 
         {users.map((user) => (

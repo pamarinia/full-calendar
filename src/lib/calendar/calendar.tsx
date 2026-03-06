@@ -17,6 +17,8 @@ export type CalendarProps = {
   onRequestAddEvent?: (request: AddEventRequest) => void;
   onRequestShowEvent?: (request: ShowEventRequest) => void;
   onRequestViewDayEvents?: (request: ViewDayEventsRequest) => void;
+  disableTimeFormatToggle?: boolean;
+  disableUserManagement?: boolean;
 };
 
 export function Calendar({
@@ -26,6 +28,8 @@ export function Calendar({
   onRequestAddEvent,
   onRequestShowEvent,
   onRequestViewDayEvents,
+  disableTimeFormatToggle,
+  disableUserManagement,
 }: CalendarProps) {
   // const { events, users } = await getCalendarData();
 
@@ -38,9 +42,11 @@ export function Calendar({
       onRequestAddEvent={onRequestAddEvent}
       onRequestShowEvent={onRequestShowEvent}
       onRequestViewDayEvents={onRequestViewDayEvents}
+      disableTimeFormatToggle={disableTimeFormatToggle}
+      disableUserManagement={disableUserManagement}
     >
       <DndProvider>
-        <div className="w-full border rounded-xl">
+        <div className="w-full h-full flex flex-col">
           <CalendarHeader />
           <CalendarBody />
         </div>

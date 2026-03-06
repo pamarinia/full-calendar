@@ -144,7 +144,7 @@ export function DayCell({ cell, events, eventPositions }: IProps) {
                   onClick={() => onRequestAddEvent?.({ startDate: date })}
                 >
                   <Plus className="h-4 w-4" />
-                  <span className="max-sm:hidden">Add Event</span>
+                  <span className="max-sm:hidden">Ajouter</span>
                 </Button>
               </div>
             ) : (
@@ -177,7 +177,7 @@ export function DayCell({ cell, events, eventPositions }: IProps) {
                 <span className="sm:hidden">+{showMoreCount}</span>
                 <span className="hidden sm:inline py-0.5 px-2 my-1 rounded-xl border">
                   {showMoreCount}
-                  <span className="mx-1">more...</span>
+                  <span className="mx-1">de plus</span>
                 </span>
               </span>
             </motion.div>

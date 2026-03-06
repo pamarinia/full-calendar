@@ -16,7 +16,7 @@ export interface ShowEventRequest {
 }
 
 export interface ViewDayEventsRequest {
-  date?: Date;
+  date: Date;
 }
 
 interface ICalendarContext {
@@ -27,6 +27,8 @@ interface ICalendarContext {
   setAgendaModeGroupBy: (groupBy: "date" | "color") => void;
   use24HourFormat: boolean;
   toggleTimeFormat: () => void;
+  disableTimeFormatToggle: boolean;
+  disableUserManagement: boolean;
   setSelectedDate: (date: Date | undefined) => void;
   selectedUserId: IUser["id"] | "all";
   setSelectedUserId: (userId: IUser["id"] | "all") => void;
@@ -72,6 +74,8 @@ export function CalendarProvider({
   onRequestAddEvent,
   onRequestShowEvent,
   onRequestViewDayEvents,
+  disableTimeFormatToggle = false,
+  disableUserManagement = false,
 }: {
   children: React.ReactNode;
   users: IUser[];
@@ -82,6 +86,8 @@ export function CalendarProvider({
   onRequestAddEvent?: (request: AddEventRequest) => void;
   onRequestShowEvent?: (request: ShowEventRequest) => void;
   onRequestViewDayEvents?: (request: ViewDayEventsRequest) => void;
+  disableTimeFormatToggle?: boolean;
+  disableUserManagement?: boolean;
 }) {
   const [settings, setSettings] = useLocalStorage<CalendarSettings>(
     "calendar-settings",
@@ -232,6 +238,8 @@ export function CalendarProvider({
     onRequestShowEvent,
     onRequestViewDayEvents,
     clearFilter,
+    disableTimeFormatToggle,
+    disableUserManagement,
   };
 
   return (

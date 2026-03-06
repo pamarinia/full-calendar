@@ -21,6 +21,7 @@ export function Settings() {
     setBadgeVariant,
     use24HourFormat,
     toggleTimeFormat,
+    disableTimeFormatToggle,
     agendaModeGroupBy,
     setAgendaModeGroupBy,
   } = useCalendar();
@@ -35,11 +36,11 @@ export function Settings() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56">
-        <DropdownMenuLabel>Calendar settings</DropdownMenuLabel>
+        <DropdownMenuLabel>Paramètres</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem>
-            Use dot badge
+            Style point
             <DropdownMenuShortcut>
               <Switch
                 icon={
@@ -56,8 +57,8 @@ export function Settings() {
               />
             </DropdownMenuShortcut>
           </DropdownMenuItem>
-          <DropdownMenuItem>
-            Use 24 hour format
+          {!disableTimeFormatToggle && <DropdownMenuItem>
+            Format 24h
             <DropdownMenuShortcut>
               <Switch
                 icon={
@@ -108,11 +109,11 @@ export function Settings() {
                 onCheckedChange={toggleTimeFormat}
               />
             </DropdownMenuShortcut>
-          </DropdownMenuItem>
+          </DropdownMenuItem>}
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuLabel>Agenda view group by</DropdownMenuLabel>
+          <DropdownMenuLabel>Grouper par</DropdownMenuLabel>
           <DropdownMenuRadioGroup
             value={agendaModeGroupBy}
             onValueChange={(value) =>
@@ -120,7 +121,7 @@ export function Settings() {
             }
           >
             <DropdownMenuRadioItem value="date">Date</DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value="color">Color</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="color">Couleur</DropdownMenuRadioItem>
           </DropdownMenuRadioGroup>
         </DropdownMenuGroup>
       </DropdownMenuContent>

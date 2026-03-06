@@ -22,7 +22,7 @@ import Views from "./view-tabs";
 import { Button } from "../../components/ui/button";
 
 export function CalendarHeader() {
-  const { view, events, onRequestAddEvent } = useCalendar();
+  const { view, events, onRequestAddEvent, disableUserManagement } = useCalendar();
 
   return (
     <div className="flex flex-col gap-4 border-b p-4 lg:flex-row lg:items-center lg:justify-between">
@@ -50,11 +50,11 @@ export function CalendarHeader() {
         </div>
 
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:gap-1.5">
-          <UserSelect />
+          {!disableUserManagement && <UserSelect />}
 
           <Button onClick={() => onRequestAddEvent?.({})}>
             <Plus className="h-4 w-4" />
-            Add Event
+            Ajouter
           </Button>
         </div>
         <Settings />

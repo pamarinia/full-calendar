@@ -1,6 +1,5 @@
 import { addDays, format, isSameDay, parseISO, startOfWeek } from "date-fns";
 import { motion } from "framer-motion";
-import { ScrollArea } from "../../../components/ui/scroll-area";
 import { fadeIn, staggerContainer, transition } from "../../animations";
 import { useCalendar } from "../../contexts/calendar-context";
 import { DroppableArea } from "../../dnd/droppable-area";
@@ -25,6 +24,7 @@ export function CalendarWeekView({ singleDayEvents, multiDayEvents }: IProps) {
 
   return (
     <motion.div
+      className="h-full flex flex-col"
       initial="initial"
       animate="animate"
       exit="exit"
@@ -37,11 +37,14 @@ export function CalendarWeekView({ singleDayEvents, multiDayEvents }: IProps) {
         animate={{ opacity: 1, y: 0 }}
         transition={transition}
       >
-        <p>Weekly view is not recommended on smaller devices.</p>
-        <p>Please switch to a desktop device or use the daily view instead.</p>
+        <p>La vue semaine n'est pas recommandée sur les petits écrans.</p>
+        <p>Veuillez utiliser un ordinateur ou passer en vue journalière.</p>
       </motion.div>
 
-      <motion.div className="flex-col sm:flex" variants={staggerContainer}>
+      <motion.div
+        className="flex-col sm:flex flex-1 min-h-0"
+        variants={staggerContainer}
+      >
         <div>
           <WeekViewMultiDayEventsRow
             selectedDate={selectedDate}
@@ -86,109 +89,119 @@ export function CalendarWeekView({ singleDayEvents, multiDayEvents }: IProps) {
           </motion.div>
         </div>
 
-        <ScrollArea className="h-[736px]" type="always">
-          <div className="flex">
-            {/* Hours column */}
-            <motion.div className="relative w-18" variants={staggerContainer}>
-              {hours.map((hour, index) => (
-                <motion.div
-                  key={hour}
-                  className="relative"
-                  style={{ height: "96px" }}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.02, ...transition }}
-                >
-                  <div className="absolute -top-3 right-2 flex h-6 items-center">
-                    {index !== 0 && (
-                      <span className="text-xs text-t-quaternary">
-                        {format(
-                          new Date().setHours(hour, 0, 0, 0),
-                          use24HourFormat ? "HH:00" : "h a"
-                        )}
-                      </span>
-                    )}
-                  </div>
-                </motion.div>
-              ))}
-            </motion.div>
-
-            {/* Week grid */}
-            <motion.div
-              className="relative flex-1 border-l"
-              variants={staggerContainer}
-            >
-              <div className="grid grid-cols-7 divide-x">
-                {weekDays.map((day, dayIndex) => {
-                  const dayEvents = singleDayEvents.filter(
-                    (event) =>
-                      isSameDay(parseISO(event.startDate), day) ||
-                      isSameDay(parseISO(event.endDate), day)
-                  );
-                  const groupedEvents = groupEvents(dayEvents);
-
-                  return (
-                    <motion.div
-                      key={day.toISOString()}
-                      className="relative"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: dayIndex * 0.1, ...transition }}
-                    >
-                      {hours.map((hour, index) => (
-                        <motion.div
-                          key={hour}
-                          className="relative"
-                          style={{ height: "96px" }}
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          transition={{ delay: index * 0.01, ...transition }}
-                        >
-                          {index !== 0 && (
-                            <div className="pointer-events-none absolute inset-x-0 top-0 border-b"></div>
+        <div className="flex-1 min-h-0 overflow-y-scroll">
+            <div className="flex">
+              {/* Hours column */}
+              <motion.div className="relative w-18" variants={staggerContainer}>
+                {hours.map((hour, index) => (
+                  <motion.div
+                    key={hour}
+                    className="relative"
+                    style={{ height: "96px" }}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.02, ...transition }}
+                  >
+                    <div className="absolute -top-3 right-2 flex h-6 items-center">
+                      {index !== 0 && (
+                        <span className="text-xs text-t-quaternary">
+                          {format(
+                            new Date().setHours(hour, 0, 0, 0),
+                            use24HourFormat ? "HH:00" : "h a"
                           )}
+                        </span>
+                      )}
+                    </div>
+                  </motion.div>
+                ))}
+              </motion.div>
 
-                          <DroppableArea
-                            date={day}
-                            hour={hour}
-                            minute={0}
-                            className="absolute inset-x-0 top-0  h-[48px]"
+              {/* Week grid */}
+              <motion.div
+                className="relative flex-1 border-l"
+                variants={staggerContainer}
+              >
+                <div className="grid grid-cols-7 divide-x">
+                  {weekDays.map((day, dayIndex) => {
+                    const dayEvents = singleDayEvents.filter(
+                      (event) =>
+                        isSameDay(parseISO(event.startDate), day) ||
+                        isSameDay(parseISO(event.endDate), day)
+                    );
+                    const groupedEvents = groupEvents(dayEvents);
+
+                    return (
+                      <motion.div
+                        key={day.toISOString()}
+                        className="relative"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: dayIndex * 0.1, ...transition }}
+                      >
+                        {hours.map((hour, index) => (
+                          <motion.div
+                            key={hour}
+                            className="relative"
+                            style={{ height: "96px" }}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: index * 0.01, ...transition }}
                           >
-                            <div
-                              className="absolute inset-0 cursor-pointer transition-colors hover:bg-secondary"
-                              onClick={() => onRequestAddEvent?.({ startDate: day, startTime: { hour, minute: 0 } })}
-                            />
-                          </DroppableArea>
+                            {index !== 0 && (
+                              <div className="pointer-events-none absolute inset-x-0 top-0 border-b"></div>
+                            )}
 
-                          <div className="pointer-events-none absolute inset-x-0 top-1/2 border-b border-dashed border-b-tertiary"></div>
+                            <DroppableArea
+                              date={day}
+                              hour={hour}
+                              minute={0}
+                              className="absolute inset-x-0 top-0  h-[48px]"
+                            >
+                              <div
+                                className="absolute inset-0 cursor-pointer transition-colors hover:bg-secondary"
+                                onClick={() =>
+                                  onRequestAddEvent?.({
+                                    startDate: day,
+                                    startTime: { hour, minute: 0 },
+                                  })
+                                }
+                              />
+                            </DroppableArea>
 
-                          <DroppableArea
-                            date={day}
-                            hour={hour}
-                            minute={30}
-                            className="absolute inset-x-0 bottom-0 h-[48px]"
-                          >
-                            <div
-                              className="absolute inset-0 cursor-pointer transition-colors hover:bg-secondary"
-                              onClick={() => onRequestAddEvent?.({ startDate: day, startTime: { hour, minute: 30 } })}
-                            />
-                          </DroppableArea>
-                        </motion.div>
-                      ))}
+                            <div className="pointer-events-none absolute inset-x-0 top-1/2 border-b border-dashed border-b-tertiary"></div>
 
-                      <RenderGroupedEvents
-                        groupedEvents={groupedEvents}
-                        day={day}
-                      />
-                    </motion.div>
-                  );
-                })}
-              </div>
+                            <DroppableArea
+                              date={day}
+                              hour={hour}
+                              minute={30}
+                              className="absolute inset-x-0 bottom-0 h-[48px]"
+                            >
+                              <div
+                                className="absolute inset-0 cursor-pointer transition-colors hover:bg-secondary"
+                                onClick={() =>
+                                  onRequestAddEvent?.({
+                                    startDate: day,
+                                    startTime: { hour, minute: 30 },
+                                  })
+                                }
+                              />
+                            </DroppableArea>
+                          </motion.div>
+                        ))}
 
-              <CalendarTimeline />
-            </motion.div>
-          </div>
-        </ScrollArea>
+                        <RenderGroupedEvents
+                          groupedEvents={groupedEvents}
+                          day={day}
+                        />
+                      </motion.div>
+                    );
+                  })}
+                </div>
+
+                <CalendarTimeline />
+              </motion.div>
+            </div>
+        </div>
       </motion.div>
     </motion.div>
   );

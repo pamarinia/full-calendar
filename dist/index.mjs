@@ -95,7 +95,9 @@ function CalendarProvider({
   onEventUpdate,
   onRequestAddEvent,
   onRequestShowEvent,
-  onRequestViewDayEvents
+  onRequestViewDayEvents,
+  disableTimeFormatToggle = false,
+  disableUserManagement = false
 }) {
   const [settings, setSettings] = useLocalStorage(
     "calendar-settings",
@@ -206,7 +208,9 @@ function CalendarProvider({
     onRequestAddEvent,
     onRequestShowEvent,
     onRequestViewDayEvents,
-    clearFilter
+    clearFilter,
+    disableTimeFormatToggle,
+    disableUserManagement
   };
   return /* @__PURE__ */ jsx(CalendarContext.Provider, { value, children });
 }
@@ -369,6 +373,7 @@ var buttonHover = {
 
 // src/lib/calendar/header/date-navigator.tsx
 import { formatDate } from "date-fns";
+import { fr } from "date-fns/locale";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useMemo as useMemo3 } from "react";
@@ -525,7 +530,7 @@ function rangeText(view, date) {
       end = endOfMonth(date);
       break;
     default:
-      return "Error while formatting";
+      return "Erreur de formatage";
   }
   return `${format(start, FORMAT_STRING)} - ${format(end, FORMAT_STRING)}`;
 }
@@ -731,7 +736,7 @@ var MotionButton = motion.create(Button);
 var MotionBadge = motion.create(Badge);
 function DateNavigator({ view, events }) {
   const { selectedDate, setSelectedDate } = useCalendar();
-  const month = formatDate(selectedDate, "MMMM");
+  const month = formatDate(selectedDate, "MMMM", { locale: fr });
   const year = selectedDate.getFullYear();
   const eventCount = useMemo3(
     () => getEventsCount(events, selectedDate, view),
@@ -765,7 +770,8 @@ function DateNavigator({ view, events }) {
           transition,
           children: [
             eventCount,
-            " events"
+            " t\xE2che",
+            eventCount !== 1 ? "s" : ""
           ]
         },
         eventCount
@@ -1090,7 +1096,7 @@ function FilterEvents() {
           },
           children: [
             /* @__PURE__ */ jsx9(RefreshCcw, { className: "size-3.5" }),
-            "Clear Filter"
+            "Effacer le filtre"
           ]
         }
       )
@@ -1377,7 +1383,7 @@ import { jsx as jsx14, jsxs as jsxs7 } from "react/jsx-runtime";
 function UserSelect() {
   const { users, selectedUserId, filterEventsBySelectedUser } = useCalendar();
   return /* @__PURE__ */ jsxs7(Select, { value: selectedUserId, onValueChange: filterEventsBySelectedUser, children: [
-    /* @__PURE__ */ jsx14(SelectTrigger, { className: "w-full", children: /* @__PURE__ */ jsx14(SelectValue, { placeholder: "Select a user" }) }),
+    /* @__PURE__ */ jsx14(SelectTrigger, { className: "w-full", children: /* @__PURE__ */ jsx14(SelectValue, { placeholder: "S\xE9lectionner un utilisateur" }) }),
     /* @__PURE__ */ jsxs7(SelectContent, { align: "end", children: [
       /* @__PURE__ */ jsxs7(SelectItem, { value: "all", children: [
         /* @__PURE__ */ jsx14(AvatarGroup, { className: "mx-2 flex items-center", max: 3, children: users.map((user) => {
@@ -1393,7 +1399,7 @@ function UserSelect() {
             /* @__PURE__ */ jsx14(AvatarFallback, { className: "text-xxs", children: user.name[0] })
           ] }, user.id);
         }) }),
-        "All"
+        "Tous"
       ] }),
       users.map((user) => {
         var _a;
@@ -1469,6 +1475,7 @@ function Settings() {
     setBadgeVariant,
     use24HourFormat,
     toggleTimeFormat,
+    disableTimeFormatToggle,
     agendaModeGroupBy,
     setAgendaModeGroupBy
   } = useCalendar();
@@ -1476,11 +1483,11 @@ function Settings() {
   return /* @__PURE__ */ jsxs8(DropdownMenu, { children: [
     /* @__PURE__ */ jsx16(DropdownMenuTrigger, { asChild: true, children: /* @__PURE__ */ jsx16(Button, { variant: "outline", size: "icon", children: /* @__PURE__ */ jsx16(SettingsIcon, {}) }) }),
     /* @__PURE__ */ jsxs8(DropdownMenuContent, { className: "w-56", children: [
-      /* @__PURE__ */ jsx16(DropdownMenuLabel, { children: "Calendar settings" }),
+      /* @__PURE__ */ jsx16(DropdownMenuLabel, { children: "Param\xE8tres" }),
       /* @__PURE__ */ jsx16(DropdownMenuSeparator, {}),
       /* @__PURE__ */ jsxs8(DropdownMenuGroup, { children: [
         /* @__PURE__ */ jsxs8(DropdownMenuItem, { children: [
-          "Use dot badge",
+          "Style point",
           /* @__PURE__ */ jsx16(DropdownMenuShortcut, { children: /* @__PURE__ */ jsx16(
             Switch,
             {
@@ -1490,8 +1497,8 @@ function Settings() {
             }
           ) })
         ] }),
-        /* @__PURE__ */ jsxs8(DropdownMenuItem, { children: [
-          "Use 24 hour format",
+        !disableTimeFormatToggle && /* @__PURE__ */ jsxs8(DropdownMenuItem, { children: [
+          "Format 24h",
           /* @__PURE__ */ jsx16(DropdownMenuShortcut, { children: /* @__PURE__ */ jsx16(
             Switch,
             {
@@ -1549,7 +1556,7 @@ function Settings() {
       ] }),
       /* @__PURE__ */ jsx16(DropdownMenuSeparator, {}),
       /* @__PURE__ */ jsxs8(DropdownMenuGroup, { children: [
-        /* @__PURE__ */ jsx16(DropdownMenuLabel, { children: "Agenda view group by" }),
+        /* @__PURE__ */ jsx16(DropdownMenuLabel, { children: "Grouper par" }),
         /* @__PURE__ */ jsxs8(
           DropdownMenuRadioGroup,
           {
@@ -1557,7 +1564,7 @@ function Settings() {
             onValueChange: (value) => setAgendaModeGroupBy(value),
             children: [
               /* @__PURE__ */ jsx16(DropdownMenuRadioItem, { value: "date", children: "Date" }),
-              /* @__PURE__ */ jsx16(DropdownMenuRadioItem, { value: "color", children: "Color" })
+              /* @__PURE__ */ jsx16(DropdownMenuRadioItem, { value: "color", children: "Couleur" })
             ]
           }
         )
@@ -1632,22 +1639,22 @@ var tabs = [
     icon: () => /* @__PURE__ */ jsx18(CalendarRange, { className: "h-4 w-4" })
   },
   {
-    name: "Day",
+    name: "Jour",
     value: "day",
     icon: () => /* @__PURE__ */ jsx18(List2, { className: "h-4 w-4" })
   },
   {
-    name: "Week",
+    name: "Semaine",
     value: "week",
     icon: () => /* @__PURE__ */ jsx18(Columns, { className: "h-4 w-4" })
   },
   {
-    name: "Month",
+    name: "Mois",
     value: "month",
     icon: () => /* @__PURE__ */ jsx18(Grid3X3, { className: "h-4 w-4" })
   },
   {
-    name: "Year",
+    name: "Ann\xE9e",
     value: "year",
     icon: () => /* @__PURE__ */ jsx18(Grid2X2, { className: "h-4 w-4" })
   }
@@ -1715,7 +1722,7 @@ var view_tabs_default = memo(Views);
 // src/lib/calendar/header/calendar-header.tsx
 import { jsx as jsx19, jsxs as jsxs10 } from "react/jsx-runtime";
 function CalendarHeader() {
-  const { view, events, onRequestAddEvent } = useCalendar();
+  const { view, events, onRequestAddEvent, disableUserManagement } = useCalendar();
   return /* @__PURE__ */ jsxs10("div", { className: "flex flex-col gap-4 border-b p-4 lg:flex-row lg:items-center lg:justify-between", children: [
     /* @__PURE__ */ jsxs10(
       motion4.div,
@@ -1745,10 +1752,10 @@ function CalendarHeader() {
             /* @__PURE__ */ jsx19(view_tabs_default, {})
           ] }),
           /* @__PURE__ */ jsxs10("div", { className: "flex flex-col gap-4 lg:flex-row lg:items-center lg:gap-1.5", children: [
-            /* @__PURE__ */ jsx19(UserSelect, {}),
+            !disableUserManagement && /* @__PURE__ */ jsx19(UserSelect, {}),
             /* @__PURE__ */ jsxs10(Button, { onClick: () => onRequestAddEvent == null ? void 0 : onRequestAddEvent({}), children: [
               /* @__PURE__ */ jsx19(Plus, { className: "h-4 w-4" }),
-              "Add Event"
+              "Ajouter"
             ] })
           ] }),
           /* @__PURE__ */ jsx19(Settings, {})
@@ -1930,7 +1937,7 @@ var AgendaEvents = () => {
     (a, b) => new Date(a[0]).getTime() - new Date(b[0]).getTime()
   );
   return /* @__PURE__ */ jsxs12(Command, { className: "py-4 h-[80vh] bg-transparent", children: [
-    /* @__PURE__ */ jsx22("div", { className: "mb-4 mx-4", children: /* @__PURE__ */ jsx22(CommandInput, { placeholder: "Type a command or search..." }) }),
+    /* @__PURE__ */ jsx22("div", { className: "mb-4 mx-4", children: /* @__PURE__ */ jsx22(CommandInput, { placeholder: "Rechercher..." }) }),
     /* @__PURE__ */ jsxs12(CommandList, { className: "max-h-max px-3 border-t", children: [
       groupedAndSortedEvents.map(([date, groupedEvents]) => /* @__PURE__ */ jsx22(
         CommandGroup,
@@ -1947,43 +1954,50 @@ var AgendaEvents = () => {
                   "hover:opacity-60": badgeVariant === "colored"
                 }
               ),
-              children: /* @__PURE__ */ jsxs12("div", { className: "w-full flex items-center justify-between gap-4 cursor-pointer", onClick: () => onRequestShowEvent == null ? void 0 : onRequestShowEvent({ event }), children: [
-                /* @__PURE__ */ jsxs12("div", { className: "flex items-center gap-2", children: [
-                  badgeVariant === "dot" ? /* @__PURE__ */ jsx22(EventBullet, { color: event.color }) : /* @__PURE__ */ jsxs12(Avatar, { children: [
-                    /* @__PURE__ */ jsx22(AvatarImage, { src: "", alt: "@shadcn" }),
-                    /* @__PURE__ */ jsx22(AvatarFallback, { className: getBgColor(event.color), children: getFirstLetters(event.title) })
-                  ] }),
-                  /* @__PURE__ */ jsxs12("div", { className: "flex flex-col", children: [
-                    /* @__PURE__ */ jsx22(
-                      "p",
-                      {
-                        className: cn({
-                          "font-medium": badgeVariant === "dot",
-                          "text-foreground": badgeVariant === "dot"
-                        }),
-                        children: event.title
-                      }
-                    ),
-                    /* @__PURE__ */ jsx22("p", { className: "text-muted-foreground text-sm line-clamp-1 text-ellipsis md:text-clip w-1/3", children: event.description })
-                  ] })
-                ] }),
-                /* @__PURE__ */ jsx22("div", { className: "w-40 flex justify-center items-center gap-1", children: agendaModeGroupBy === "date" ? /* @__PURE__ */ jsxs12(Fragment, { children: [
-                  /* @__PURE__ */ jsx22("p", { className: "text-sm", children: formatTime(event.startDate, use24HourFormat) }),
-                  /* @__PURE__ */ jsx22("span", { className: "text-muted-foreground", children: "-" }),
-                  /* @__PURE__ */ jsx22("p", { className: "text-sm", children: formatTime(event.endDate, use24HourFormat) })
-                ] }) : /* @__PURE__ */ jsxs12(Fragment, { children: [
-                  /* @__PURE__ */ jsx22("p", { className: "text-sm", children: format2(event.startDate, "MM/dd/yyyy") }),
-                  /* @__PURE__ */ jsx22("span", { className: "text-sm", children: "at" }),
-                  /* @__PURE__ */ jsx22("p", { className: "text-sm", children: formatTime(event.startDate, use24HourFormat) })
-                ] }) })
-              ] })
+              children: /* @__PURE__ */ jsxs12(
+                "div",
+                {
+                  className: "w-full flex items-center justify-between gap-4 cursor-pointer",
+                  onClick: () => onRequestShowEvent == null ? void 0 : onRequestShowEvent({ event }),
+                  children: [
+                    /* @__PURE__ */ jsxs12("div", { className: "flex items-center gap-2", children: [
+                      badgeVariant === "dot" ? /* @__PURE__ */ jsx22(EventBullet, { color: event.color }) : /* @__PURE__ */ jsxs12(Avatar, { children: [
+                        /* @__PURE__ */ jsx22(AvatarImage, { src: "", alt: "@shadcn" }),
+                        /* @__PURE__ */ jsx22(AvatarFallback, { className: getBgColor(event.color), children: getFirstLetters(event.title) })
+                      ] }),
+                      /* @__PURE__ */ jsxs12("div", { className: "flex flex-col", children: [
+                        /* @__PURE__ */ jsx22(
+                          "p",
+                          {
+                            className: cn({
+                              "font-medium": badgeVariant === "dot",
+                              "text-foreground": badgeVariant === "dot"
+                            }),
+                            children: event.title
+                          }
+                        ),
+                        /* @__PURE__ */ jsx22("p", { className: "text-muted-foreground text-sm line-clamp-1 text-ellipsis md:text-clip", children: event.description })
+                      ] })
+                    ] }),
+                    /* @__PURE__ */ jsx22("div", { className: "w-40 flex justify-center items-center gap-1", children: agendaModeGroupBy === "date" ? /* @__PURE__ */ jsxs12(Fragment, { children: [
+                      /* @__PURE__ */ jsx22("p", { className: "text-sm", children: formatTime(event.startDate, use24HourFormat) }),
+                      /* @__PURE__ */ jsx22("span", { className: "text-muted-foreground", children: "-" }),
+                      /* @__PURE__ */ jsx22("p", { className: "text-sm", children: formatTime(event.endDate, use24HourFormat) })
+                    ] }) : /* @__PURE__ */ jsxs12(Fragment, { children: [
+                      /* @__PURE__ */ jsx22("p", { className: "text-sm", children: format2(event.startDate, "MM/dd/yyyy") }),
+                      /* @__PURE__ */ jsx22("span", { className: "text-sm", children: "\xE0" }),
+                      /* @__PURE__ */ jsx22("p", { className: "text-sm", children: formatTime(event.startDate, use24HourFormat) })
+                    ] }) })
+                  ]
+                }
+              )
             },
             event.id
           ))
         },
         date
       )),
-      /* @__PURE__ */ jsx22(CommandEmpty, { children: "No results found." })
+      /* @__PURE__ */ jsx22(CommandEmpty, { children: "Aucun r\xE9sultat trouv\xE9." })
     ] })
   ] });
 };
@@ -2275,7 +2289,7 @@ function DayCell({ cell, events, eventPositions }) {
                   onClick: () => onRequestAddEvent == null ? void 0 : onRequestAddEvent({ startDate: date }),
                   children: [
                     /* @__PURE__ */ jsx26(Plus2, { className: "h-4 w-4" }),
-                    /* @__PURE__ */ jsx26("span", { className: "max-sm:hidden", children: "Add Event" })
+                    /* @__PURE__ */ jsx26("span", { className: "max-sm:hidden", children: "Ajouter" })
                   ]
                 }
               ) }) : [0, 1, 2].map(renderEventAtPosition)
@@ -2307,7 +2321,7 @@ function DayCell({ cell, events, eventPositions }) {
                     ] }),
                     /* @__PURE__ */ jsxs14("span", { className: "hidden sm:inline py-0.5 px-2 my-1 rounded-xl border", children: [
                       showMoreCount,
-                      /* @__PURE__ */ jsx26("span", { className: "mx-1", children: "more..." })
+                      /* @__PURE__ */ jsx26("span", { className: "mx-1", children: "de plus" })
                     ] })
                   ]
                 }
@@ -2339,7 +2353,7 @@ function DayCell({ cell, events, eventPositions }) {
 
 // src/lib/calendar/views/month-view/calendar-month-view.tsx
 import { jsx as jsx27, jsxs as jsxs15 } from "react/jsx-runtime";
-var WEEK_DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+var WEEK_DAYS = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
 function CalendarMonthView({ singleDayEvents, multiDayEvents }) {
   const { selectedDate } = useCalendar();
   const allEvents = [...multiDayEvents, ...singleDayEvents];
@@ -2353,7 +2367,7 @@ function CalendarMonthView({ singleDayEvents, multiDayEvents }) {
     [multiDayEvents, singleDayEvents, selectedDate]
   );
   return /* @__PURE__ */ jsxs15(motion8.div, { initial: "initial", animate: "animate", variants: staggerContainer, children: [
-    /* @__PURE__ */ jsx27("div", { className: "grid grid-cols-7", children: WEEK_DAYS.map((day, index) => /* @__PURE__ */ jsx27(
+    /* @__PURE__ */ jsx27("div", { className: "grid grid-cols-7 sticky top-0 z-10 bg-background border-b", children: WEEK_DAYS.map((day, index) => /* @__PURE__ */ jsx27(
       motion8.div,
       {
         className: "flex items-center justify-center py-2",
@@ -2492,7 +2506,7 @@ function ScrollArea(_a) {
     ScrollAreaPrimitive.Root,
     __spreadProps(__spreadValues({
       "data-slot": "scroll-area",
-      className: cn("relative", className)
+      className: cn("relative overflow-hidden", className)
     }, props), {
       children: [
         /* @__PURE__ */ jsx29(
@@ -2893,7 +2907,13 @@ function RenderGroupedEvents({
 // src/lib/calendar/views/week-and-day-view/calendar-day-view.tsx
 import { jsx as jsx35, jsxs as jsxs21 } from "react/jsx-runtime";
 function CalendarDayView({ singleDayEvents, multiDayEvents }) {
-  const { selectedDate, setSelectedDate, users, use24HourFormat, onRequestAddEvent } = useCalendar();
+  const {
+    selectedDate,
+    setSelectedDate,
+    users,
+    use24HourFormat,
+    onRequestAddEvent
+  } = useCalendar();
   const scrollAreaRef = useRef2(null);
   const hours = Array.from({ length: 24 }, (_, i) => i);
   useEffect4(() => {
@@ -2930,8 +2950,8 @@ function CalendarDayView({ singleDayEvents, multiDayEvents }) {
     return eventDate.getDate() === selectedDate.getDate() && eventDate.getMonth() === selectedDate.getMonth() && eventDate.getFullYear() === selectedDate.getFullYear();
   });
   const groupedEvents = groupEvents(dayEvents);
-  return /* @__PURE__ */ jsxs21("div", { className: "flex", children: [
-    /* @__PURE__ */ jsxs21("div", { className: "flex flex-1 flex-col", children: [
+  return /* @__PURE__ */ jsxs21("div", { className: "flex h-full", children: [
+    /* @__PURE__ */ jsxs21("div", { className: "flex flex-1 flex-col min-h-0", children: [
       /* @__PURE__ */ jsxs21("div", { children: [
         /* @__PURE__ */ jsx35(
           DayViewMultiDayEventsRow,
@@ -2949,7 +2969,7 @@ function CalendarDayView({ singleDayEvents, multiDayEvents }) {
           ] })
         ] })
       ] }),
-      /* @__PURE__ */ jsx35(ScrollArea, { className: "h-[800px]", type: "always", ref: scrollAreaRef, children: /* @__PURE__ */ jsxs21("div", { className: "flex", children: [
+      /* @__PURE__ */ jsx35("div", { className: "flex-1 min-h-0 overflow-y-scroll", ref: scrollAreaRef, children: /* @__PURE__ */ jsxs21("div", { className: "flex", children: [
         /* @__PURE__ */ jsx35("div", { className: "relative w-18", children: hours.map((hour, index) => /* @__PURE__ */ jsx35("div", { className: "relative", style: { height: "96px" }, children: /* @__PURE__ */ jsx35("div", { className: "absolute -top-3 right-2 flex h-6 items-center", children: index !== 0 && /* @__PURE__ */ jsx35("span", { className: "text-xs text-t-quaternary", children: format4(
           (/* @__PURE__ */ new Date()).setHours(hour, 0, 0, 0),
           use24HourFormat ? "HH:00" : "h a"
@@ -2974,7 +2994,10 @@ function CalendarDayView({ singleDayEvents, multiDayEvents }) {
                         "div",
                         {
                           className: "absolute inset-0 cursor-pointer transition-colors hover:bg-secondary",
-                          onClick: () => onRequestAddEvent == null ? void 0 : onRequestAddEvent({ startDate: selectedDate, startTime: { hour, minute: 0 } })
+                          onClick: () => onRequestAddEvent == null ? void 0 : onRequestAddEvent({
+                            startDate: selectedDate,
+                            startTime: { hour, minute: 0 }
+                          })
                         }
                       )
                     }
@@ -2991,7 +3014,10 @@ function CalendarDayView({ singleDayEvents, multiDayEvents }) {
                         "div",
                         {
                           className: "absolute inset-0 cursor-pointer transition-colors hover:bg-secondary",
-                          onClick: () => onRequestAddEvent == null ? void 0 : onRequestAddEvent({ startDate: selectedDate, startTime: { hour, minute: 30 } })
+                          onClick: () => onRequestAddEvent == null ? void 0 : onRequestAddEvent({
+                            startDate: selectedDate,
+                            startTime: { hour, minute: 30 }
+                          })
                         }
                       )
                     }
@@ -3029,8 +3055,8 @@ function CalendarDayView({ singleDayEvents, multiDayEvents }) {
             /* @__PURE__ */ jsx35("span", { className: "absolute inline-flex size-full animate-ping rounded-full bg-green-400 opacity-75" }),
             /* @__PURE__ */ jsx35("span", { className: "relative inline-flex size-2.5 rounded-full bg-green-600" })
           ] }),
-          /* @__PURE__ */ jsx35("p", { className: "text-sm font-semibold text-t-secondary", children: "Happening now" })
-        ] }) : /* @__PURE__ */ jsx35("p", { className: "p-4 text-center text-sm italic text-t-tertiary", children: "No appointments or consultations at the moment" }),
+          /* @__PURE__ */ jsx35("p", { className: "text-sm font-semibold text-t-secondary", children: "En ce moment" })
+        ] }) : /* @__PURE__ */ jsx35("p", { className: "p-4 text-center text-sm italic text-t-tertiary", children: "Aucun rendez-vous en ce moment" }),
         currentEvents.length > 0 && /* @__PURE__ */ jsx35(ScrollArea, { className: "h-[422px] px-4", type: "always", children: /* @__PURE__ */ jsx35("div", { className: "space-y-6 pb-4", children: currentEvents.map((event) => {
           const user = users.find((user2) => user2.id === event.user.id);
           return /* @__PURE__ */ jsxs21("div", { className: "space-y-1.5", children: [
@@ -3195,6 +3221,7 @@ function CalendarWeekView({ singleDayEvents, multiDayEvents }) {
   return /* @__PURE__ */ jsxs23(
     motion10.div,
     {
+      className: "h-full flex flex-col",
       initial: "initial",
       animate: "animate",
       exit: "exit",
@@ -3209,154 +3236,167 @@ function CalendarWeekView({ singleDayEvents, multiDayEvents }) {
             animate: { opacity: 1, y: 0 },
             transition,
             children: [
-              /* @__PURE__ */ jsx37("p", { children: "Weekly view is not recommended on smaller devices." }),
-              /* @__PURE__ */ jsx37("p", { children: "Please switch to a desktop device or use the daily view instead." })
+              /* @__PURE__ */ jsx37("p", { children: "La vue semaine n'est pas recommand\xE9e sur les petits \xE9crans." }),
+              /* @__PURE__ */ jsx37("p", { children: "Veuillez utiliser un ordinateur ou passer en vue journali\xE8re." })
             ]
           }
         ),
-        /* @__PURE__ */ jsxs23(motion10.div, { className: "flex-col sm:flex", variants: staggerContainer, children: [
-          /* @__PURE__ */ jsxs23("div", { children: [
-            /* @__PURE__ */ jsx37(
-              WeekViewMultiDayEventsRow,
-              {
-                selectedDate,
-                multiDayEvents
-              }
-            ),
-            /* @__PURE__ */ jsxs23(
-              motion10.div,
-              {
-                className: "relative z-20 flex border-b",
-                initial: { opacity: 0, y: -20 },
-                animate: { opacity: 1, y: 0 },
-                transition,
-                children: [
-                  /* @__PURE__ */ jsx37("div", { className: "w-18" }),
-                  /* @__PURE__ */ jsx37("div", { className: "grid flex-1 grid-cols-7  border-l", children: weekDays.map((day, index) => /* @__PURE__ */ jsxs23(
-                    motion10.span,
-                    {
-                      className: "py-1 sm:py-2 text-center text-xs font-medium text-t-quaternary",
-                      initial: { opacity: 0, y: -10 },
-                      animate: { opacity: 1, y: 0 },
-                      transition: __spreadValues({ delay: index * 0.05 }, transition),
-                      children: [
-                        /* @__PURE__ */ jsxs23("span", { className: "block sm:hidden", children: [
-                          format5(day, "EEE").charAt(0),
-                          /* @__PURE__ */ jsx37("span", { className: "block font-semibold text-t-secondary text-xs", children: format5(day, "d") })
-                        ] }),
-                        /* @__PURE__ */ jsxs23("span", { className: "hidden sm:inline", children: [
-                          format5(day, "EE"),
-                          " ",
-                          /* @__PURE__ */ jsx37("span", { className: "ml-1 font-semibold text-t-secondary", children: format5(day, "d") })
-                        ] })
-                      ]
-                    },
-                    day.toISOString()
-                  )) })
-                ]
-              }
-            )
-          ] }),
-          /* @__PURE__ */ jsx37(ScrollArea, { className: "h-[736px]", type: "always", children: /* @__PURE__ */ jsxs23("div", { className: "flex", children: [
-            /* @__PURE__ */ jsx37(motion10.div, { className: "relative w-18", variants: staggerContainer, children: hours.map((hour, index) => /* @__PURE__ */ jsx37(
-              motion10.div,
-              {
-                className: "relative",
-                style: { height: "96px" },
-                initial: { opacity: 0, x: -20 },
-                animate: { opacity: 1, x: 0 },
-                transition: __spreadValues({ delay: index * 0.02 }, transition),
-                children: /* @__PURE__ */ jsx37("div", { className: "absolute -top-3 right-2 flex h-6 items-center", children: index !== 0 && /* @__PURE__ */ jsx37("span", { className: "text-xs text-t-quaternary", children: format5(
-                  (/* @__PURE__ */ new Date()).setHours(hour, 0, 0, 0),
-                  use24HourFormat ? "HH:00" : "h a"
-                ) }) })
-              },
-              hour
-            )) }),
-            /* @__PURE__ */ jsxs23(
-              motion10.div,
-              {
-                className: "relative flex-1 border-l",
-                variants: staggerContainer,
-                children: [
-                  /* @__PURE__ */ jsx37("div", { className: "grid grid-cols-7 divide-x", children: weekDays.map((day, dayIndex) => {
-                    const dayEvents = singleDayEvents.filter(
-                      (event) => isSameDay3(parseISO10(event.startDate), day) || isSameDay3(parseISO10(event.endDate), day)
-                    );
-                    const groupedEvents = groupEvents(dayEvents);
-                    return /* @__PURE__ */ jsxs23(
-                      motion10.div,
-                      {
-                        className: "relative",
-                        initial: { opacity: 0 },
-                        animate: { opacity: 1 },
-                        transition: __spreadValues({ delay: dayIndex * 0.1 }, transition),
-                        children: [
-                          hours.map((hour, index) => /* @__PURE__ */ jsxs23(
-                            motion10.div,
-                            {
-                              className: "relative",
-                              style: { height: "96px" },
-                              initial: { opacity: 0 },
-                              animate: { opacity: 1 },
-                              transition: __spreadValues({ delay: index * 0.01 }, transition),
-                              children: [
-                                index !== 0 && /* @__PURE__ */ jsx37("div", { className: "pointer-events-none absolute inset-x-0 top-0 border-b" }),
-                                /* @__PURE__ */ jsx37(
-                                  DroppableArea,
-                                  {
-                                    date: day,
-                                    hour,
-                                    minute: 0,
-                                    className: "absolute inset-x-0 top-0  h-[48px]",
-                                    children: /* @__PURE__ */ jsx37(
-                                      "div",
+        /* @__PURE__ */ jsxs23(
+          motion10.div,
+          {
+            className: "flex-col sm:flex flex-1 min-h-0",
+            variants: staggerContainer,
+            children: [
+              /* @__PURE__ */ jsxs23("div", { children: [
+                /* @__PURE__ */ jsx37(
+                  WeekViewMultiDayEventsRow,
+                  {
+                    selectedDate,
+                    multiDayEvents
+                  }
+                ),
+                /* @__PURE__ */ jsxs23(
+                  motion10.div,
+                  {
+                    className: "relative z-20 flex border-b",
+                    initial: { opacity: 0, y: -20 },
+                    animate: { opacity: 1, y: 0 },
+                    transition,
+                    children: [
+                      /* @__PURE__ */ jsx37("div", { className: "w-18" }),
+                      /* @__PURE__ */ jsx37("div", { className: "grid flex-1 grid-cols-7  border-l", children: weekDays.map((day, index) => /* @__PURE__ */ jsxs23(
+                        motion10.span,
+                        {
+                          className: "py-1 sm:py-2 text-center text-xs font-medium text-t-quaternary",
+                          initial: { opacity: 0, y: -10 },
+                          animate: { opacity: 1, y: 0 },
+                          transition: __spreadValues({ delay: index * 0.05 }, transition),
+                          children: [
+                            /* @__PURE__ */ jsxs23("span", { className: "block sm:hidden", children: [
+                              format5(day, "EEE").charAt(0),
+                              /* @__PURE__ */ jsx37("span", { className: "block font-semibold text-t-secondary text-xs", children: format5(day, "d") })
+                            ] }),
+                            /* @__PURE__ */ jsxs23("span", { className: "hidden sm:inline", children: [
+                              format5(day, "EE"),
+                              " ",
+                              /* @__PURE__ */ jsx37("span", { className: "ml-1 font-semibold text-t-secondary", children: format5(day, "d") })
+                            ] })
+                          ]
+                        },
+                        day.toISOString()
+                      )) })
+                    ]
+                  }
+                )
+              ] }),
+              /* @__PURE__ */ jsx37("div", { className: "flex-1 min-h-0 overflow-y-scroll", children: /* @__PURE__ */ jsxs23("div", { className: "flex", children: [
+                /* @__PURE__ */ jsx37(motion10.div, { className: "relative w-18", variants: staggerContainer, children: hours.map((hour, index) => /* @__PURE__ */ jsx37(
+                  motion10.div,
+                  {
+                    className: "relative",
+                    style: { height: "96px" },
+                    initial: { opacity: 0, x: -20 },
+                    animate: { opacity: 1, x: 0 },
+                    transition: __spreadValues({ delay: index * 0.02 }, transition),
+                    children: /* @__PURE__ */ jsx37("div", { className: "absolute -top-3 right-2 flex h-6 items-center", children: index !== 0 && /* @__PURE__ */ jsx37("span", { className: "text-xs text-t-quaternary", children: format5(
+                      (/* @__PURE__ */ new Date()).setHours(hour, 0, 0, 0),
+                      use24HourFormat ? "HH:00" : "h a"
+                    ) }) })
+                  },
+                  hour
+                )) }),
+                /* @__PURE__ */ jsxs23(
+                  motion10.div,
+                  {
+                    className: "relative flex-1 border-l",
+                    variants: staggerContainer,
+                    children: [
+                      /* @__PURE__ */ jsx37("div", { className: "grid grid-cols-7 divide-x", children: weekDays.map((day, dayIndex) => {
+                        const dayEvents = singleDayEvents.filter(
+                          (event) => isSameDay3(parseISO10(event.startDate), day) || isSameDay3(parseISO10(event.endDate), day)
+                        );
+                        const groupedEvents = groupEvents(dayEvents);
+                        return /* @__PURE__ */ jsxs23(
+                          motion10.div,
+                          {
+                            className: "relative",
+                            initial: { opacity: 0 },
+                            animate: { opacity: 1 },
+                            transition: __spreadValues({ delay: dayIndex * 0.1 }, transition),
+                            children: [
+                              hours.map((hour, index) => /* @__PURE__ */ jsxs23(
+                                motion10.div,
+                                {
+                                  className: "relative",
+                                  style: { height: "96px" },
+                                  initial: { opacity: 0 },
+                                  animate: { opacity: 1 },
+                                  transition: __spreadValues({ delay: index * 0.01 }, transition),
+                                  children: [
+                                    index !== 0 && /* @__PURE__ */ jsx37("div", { className: "pointer-events-none absolute inset-x-0 top-0 border-b" }),
+                                    /* @__PURE__ */ jsx37(
+                                      DroppableArea,
                                       {
-                                        className: "absolute inset-0 cursor-pointer transition-colors hover:bg-secondary",
-                                        onClick: () => onRequestAddEvent == null ? void 0 : onRequestAddEvent({ startDate: day, startTime: { hour, minute: 0 } })
+                                        date: day,
+                                        hour,
+                                        minute: 0,
+                                        className: "absolute inset-x-0 top-0  h-[48px]",
+                                        children: /* @__PURE__ */ jsx37(
+                                          "div",
+                                          {
+                                            className: "absolute inset-0 cursor-pointer transition-colors hover:bg-secondary",
+                                            onClick: () => onRequestAddEvent == null ? void 0 : onRequestAddEvent({
+                                              startDate: day,
+                                              startTime: { hour, minute: 0 }
+                                            })
+                                          }
+                                        )
+                                      }
+                                    ),
+                                    /* @__PURE__ */ jsx37("div", { className: "pointer-events-none absolute inset-x-0 top-1/2 border-b border-dashed border-b-tertiary" }),
+                                    /* @__PURE__ */ jsx37(
+                                      DroppableArea,
+                                      {
+                                        date: day,
+                                        hour,
+                                        minute: 30,
+                                        className: "absolute inset-x-0 bottom-0 h-[48px]",
+                                        children: /* @__PURE__ */ jsx37(
+                                          "div",
+                                          {
+                                            className: "absolute inset-0 cursor-pointer transition-colors hover:bg-secondary",
+                                            onClick: () => onRequestAddEvent == null ? void 0 : onRequestAddEvent({
+                                              startDate: day,
+                                              startTime: { hour, minute: 30 }
+                                            })
+                                          }
+                                        )
                                       }
                                     )
-                                  }
-                                ),
-                                /* @__PURE__ */ jsx37("div", { className: "pointer-events-none absolute inset-x-0 top-1/2 border-b border-dashed border-b-tertiary" }),
-                                /* @__PURE__ */ jsx37(
-                                  DroppableArea,
-                                  {
-                                    date: day,
-                                    hour,
-                                    minute: 30,
-                                    className: "absolute inset-x-0 bottom-0 h-[48px]",
-                                    children: /* @__PURE__ */ jsx37(
-                                      "div",
-                                      {
-                                        className: "absolute inset-0 cursor-pointer transition-colors hover:bg-secondary",
-                                        onClick: () => onRequestAddEvent == null ? void 0 : onRequestAddEvent({ startDate: day, startTime: { hour, minute: 30 } })
-                                      }
-                                    )
-                                  }
-                                )
-                              ]
-                            },
-                            hour
-                          )),
-                          /* @__PURE__ */ jsx37(
-                            RenderGroupedEvents,
-                            {
-                              groupedEvents,
-                              day
-                            }
-                          )
-                        ]
-                      },
-                      day.toISOString()
-                    );
-                  }) }),
-                  /* @__PURE__ */ jsx37(CalendarTimeline, {})
-                ]
-              }
-            )
-          ] }) })
-        ] })
+                                  ]
+                                },
+                                hour
+                              )),
+                              /* @__PURE__ */ jsx37(
+                                RenderGroupedEvents,
+                                {
+                                  groupedEvents,
+                                  day
+                                }
+                              )
+                            ]
+                          },
+                          day.toISOString()
+                        );
+                      }) }),
+                      /* @__PURE__ */ jsx37(CalendarTimeline, {})
+                    ]
+                  }
+                )
+              ] }) })
+            ]
+          }
+        )
       ]
     }
   );
@@ -3367,20 +3407,20 @@ import { getYear, isSameDay as isSameDay4, isSameMonth as isSameMonth3 } from "d
 import { motion as motion11 } from "framer-motion";
 import { jsx as jsx38, jsxs as jsxs24 } from "react/jsx-runtime";
 var MONTHS = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December"
+  "Janvier",
+  "F\xE9vrier",
+  "Mars",
+  "Avril",
+  "Mai",
+  "Juin",
+  "Juillet",
+  "Ao\xFBt",
+  "Septembre",
+  "Octobre",
+  "Novembre",
+  "D\xE9cembre"
 ];
-var WEEKDAYS = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+var WEEKDAYS = ["Di", "Lu", "Ma", "Me", "Je", "Ve", "Sa"];
 function CalendarYearView({ singleDayEvents, multiDayEvents }) {
   const { selectedDate, setSelectedDate, onRequestViewDayEvents } = useCalendar();
   const currentYear = getYear(selectedDate);
@@ -3504,9 +3544,10 @@ function CalendarBody() {
     const endDate = parseISO11(event.endDate);
     return !isSameDay5(startDate, endDate);
   });
-  return /* @__PURE__ */ jsx39("div", { className: "w-full h-full overflow-scroll relative", children: /* @__PURE__ */ jsxs25(
+  return /* @__PURE__ */ jsx39("div", { className: "w-full flex-1 min-h-0 flex flex-col relative", children: /* @__PURE__ */ jsxs25(
     motion12.div,
     {
+      className: "flex-1 min-h-0 overflow-y-auto",
       initial: "initial",
       animate: "animate",
       exit: "exit",
@@ -3567,7 +3608,9 @@ function Calendar2({
   onEventUpdate,
   onRequestAddEvent,
   onRequestShowEvent,
-  onRequestViewDayEvents
+  onRequestViewDayEvents,
+  disableTimeFormatToggle,
+  disableUserManagement
 }) {
   return /* @__PURE__ */ jsx40(
     CalendarProvider,
@@ -3579,7 +3622,9 @@ function Calendar2({
       onRequestAddEvent,
       onRequestShowEvent,
       onRequestViewDayEvents,
-      children: /* @__PURE__ */ jsx40(DndProvider, { children: /* @__PURE__ */ jsxs26("div", { className: "w-full border rounded-xl", children: [
+      disableTimeFormatToggle,
+      disableUserManagement,
+      children: /* @__PURE__ */ jsx40(DndProvider, { children: /* @__PURE__ */ jsxs26("div", { className: "w-full h-full flex flex-col", children: [
         /* @__PURE__ */ jsx40(CalendarHeader, {}),
         /* @__PURE__ */ jsx40(CalendarBody, {})
       ] }) })

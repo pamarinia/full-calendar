@@ -13,7 +13,7 @@ interface IProps {
   multiDayEvents: IEvent[];
 }
 
-const WEEK_DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const WEEK_DAYS = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
 
 export function CalendarMonthView({ singleDayEvents, multiDayEvents }: IProps) {
   const { selectedDate } = useCalendar();
@@ -34,7 +34,7 @@ export function CalendarMonthView({ singleDayEvents, multiDayEvents }: IProps) {
 
   return (
     <motion.div initial="initial" animate="animate" variants={staggerContainer}>
-      <div className="grid grid-cols-7">
+      <div className="grid grid-cols-7 sticky top-0 z-10 bg-background border-b">
         {WEEK_DAYS.map((day, index) => (
           <motion.div
             key={day}

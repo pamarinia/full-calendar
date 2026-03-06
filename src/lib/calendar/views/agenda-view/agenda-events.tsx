@@ -50,7 +50,7 @@ export const AgendaEvents: FC = () => {
   return (
     <Command className="py-4 h-[80vh] bg-transparent">
       <div className="mb-4 mx-4">
-        <CommandInput placeholder="Type a command or search..." />
+        <CommandInput placeholder="Rechercher..." />
       </div>
       <CommandList className="max-h-max px-3 border-t">
         {groupedAndSortedEvents.map(([date, groupedEvents]) => (
@@ -75,61 +75,64 @@ export const AgendaEvents: FC = () => {
                   }
                 )}
               >
-                  <div className="w-full flex items-center justify-between gap-4 cursor-pointer" onClick={() => onRequestShowEvent?.({ event })}>
-                    <div className="flex items-center gap-2">
-                      {badgeVariant === "dot" ? (
-                        <EventBullet color={event.color} />
-                      ) : (
-                        <Avatar>
-                          <AvatarImage src="" alt="@shadcn" />
-                          <AvatarFallback className={getBgColor(event.color)}>
-                            {getFirstLetters(event.title)}
-                          </AvatarFallback>
-                        </Avatar>
-                      )}
-                      <div className="flex flex-col">
-                        <p
-                          className={cn({
-                            "font-medium": badgeVariant === "dot",
-                            "text-foreground": badgeVariant === "dot",
-                          })}
-                        >
-                          {event.title}
-                        </p>
-                        <p className="text-muted-foreground text-sm line-clamp-1 text-ellipsis md:text-clip w-1/3">
-                          {event.description}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="w-40 flex justify-center items-center gap-1">
-                      {agendaModeGroupBy === "date" ? (
-                        <>
-                          <p className="text-sm">
-                            {formatTime(event.startDate, use24HourFormat)}
-                          </p>
-                          <span className="text-muted-foreground">-</span>
-                          <p className="text-sm">
-                            {formatTime(event.endDate, use24HourFormat)}
-                          </p>
-                        </>
-                      ) : (
-                        <>
-                          <p className="text-sm">
-                            {format(event.startDate, "MM/dd/yyyy")}
-                          </p>
-                          <span className="text-sm">at</span>
-                          <p className="text-sm">
-                            {formatTime(event.startDate, use24HourFormat)}
-                          </p>
-                        </>
-                      )}
+                <div
+                  className="w-full flex items-center justify-between gap-4 cursor-pointer"
+                  onClick={() => onRequestShowEvent?.({ event })}
+                >
+                  <div className="flex items-center gap-2">
+                    {badgeVariant === "dot" ? (
+                      <EventBullet color={event.color} />
+                    ) : (
+                      <Avatar>
+                        <AvatarImage src="" alt="@shadcn" />
+                        <AvatarFallback className={getBgColor(event.color)}>
+                          {getFirstLetters(event.title)}
+                        </AvatarFallback>
+                      </Avatar>
+                    )}
+                    <div className="flex flex-col">
+                      <p
+                        className={cn({
+                          "font-medium": badgeVariant === "dot",
+                          "text-foreground": badgeVariant === "dot",
+                        })}
+                      >
+                        {event.title}
+                      </p>
+                      <p className="text-muted-foreground text-sm line-clamp-1 text-ellipsis md:text-clip">
+                        {event.description}
+                      </p>
                     </div>
                   </div>
+                  <div className="w-40 flex justify-center items-center gap-1">
+                    {agendaModeGroupBy === "date" ? (
+                      <>
+                        <p className="text-sm">
+                          {formatTime(event.startDate, use24HourFormat)}
+                        </p>
+                        <span className="text-muted-foreground">-</span>
+                        <p className="text-sm">
+                          {formatTime(event.endDate, use24HourFormat)}
+                        </p>
+                      </>
+                    ) : (
+                      <>
+                        <p className="text-sm">
+                          {format(event.startDate, "MM/dd/yyyy")}
+                        </p>
+                        <span className="text-sm">à</span>
+                        <p className="text-sm">
+                          {formatTime(event.startDate, use24HourFormat)}
+                        </p>
+                      </>
+                    )}
+                  </div>
+                </div>
               </CommandItem>
             ))}
           </CommandGroup>
         ))}
-        <CommandEmpty>No results found.</CommandEmpty>
+        <CommandEmpty>Aucun résultat trouvé.</CommandEmpty>
       </CommandList>
     </Command>
   );

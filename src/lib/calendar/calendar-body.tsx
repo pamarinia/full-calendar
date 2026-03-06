@@ -26,9 +26,10 @@ export function CalendarBody() {
   });
 
   return (
-    <div className="w-full h-full overflow-scroll relative">
+    <div className="w-full flex-1 min-h-0 flex flex-col relative">
       <motion.div
         key={view}
+        className="flex-1 min-h-0 overflow-y-auto"
         initial="initial"
         animate="animate"
         exit="exit"
