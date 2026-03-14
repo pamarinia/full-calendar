@@ -1,4 +1,4 @@
-import { addDays, format, isSameDay, parseISO, startOfWeek } from "date-fns";
+import { addDays, differenceInMinutes, format, isSameDay, parseISO, startOfWeek } from "date-fns";
 import { motion } from "framer-motion";
 import { useCallback, useRef } from "react";
 import { fadeIn, staggerContainer, transition } from "../../animations";
@@ -20,7 +20,7 @@ const QUARTER_MINUTES = 15;
 
 export function CalendarWeekView({ singleDayEvents, multiDayEvents }: IProps) {
   const { selectedDate, use24HourFormat, onRequestAddEvent } = useCalendar();
-  const { isDragging, dragPreview, handleEventDrop, updateDragPreview } =
+  const { isDragging, draggedEvent, dragPreview, dragOffsetY, handleEventDrop, updateDragPreview } =
     useDragDrop();
 
   const gridRef = useRef<HTMLDivElement>(null);
@@ -36,7 +36,7 @@ export function CalendarWeekView({ singleDayEvents, multiDayEvents }: IProps) {
 
       const rect = grid.getBoundingClientRect();
       const x = clientX - rect.left;
-      const y = clientY - rect.top + grid.scrollTop;
+      const y = clientY - rect.top + grid.scrollTop - dragOffsetY;
 
       const colWidth = rect.width / 7;
       const dayIndex = Math.max(0, Math.min(6, Math.floor(x / colWidth)));
@@ -51,7 +51,7 @@ export function CalendarWeekView({ singleDayEvents, multiDayEvents }: IProps) {
 
       return { date: weekDays[dayIndex], hour, minute };
     },
-    [weekDays]
+    [weekDays, dragOffsetY]
   );
 
   const handleDragOver = useCallback(
@@ -242,16 +242,23 @@ export function CalendarWeekView({ singleDayEvents, multiDayEvents }: IProps) {
 
                         {/* Drag preview indicator */}
                         {isDragging &&
+                          draggedEvent &&
                           dragPreview &&
-                          isSameDay(dragPreview.date, day) && (
-                            <div
-                              className="absolute inset-x-1 rounded-md bg-primary/20 border-2 border-primary/40 pointer-events-none z-30 transition-[top] duration-75"
-                              style={{
-                                top: `${((dragPreview.hour * 60 + dragPreview.minute) / 1440) * 100}%`,
-                                height: "24px",
-                              }}
-                            />
-                          )}
+                          isSameDay(dragPreview.date, day) && (() => {
+                            const evtStart = parseISO(draggedEvent.startDate);
+                            const evtEnd = parseISO(draggedEvent.endDate);
+                            const durationMin = differenceInMinutes(evtEnd, evtStart);
+                            const heightPx = (durationMin / 60) * HOUR_HEIGHT;
+                            return (
+                              <div
+                                className="absolute inset-x-1 rounded-md bg-primary/20 border-2 border-primary/40 pointer-events-none z-30 transition-[top] duration-75"
+                                style={{
+                                  top: `${((dragPreview.hour * 60 + dragPreview.minute) / 1440) * 100}%`,
+                                  height: `${heightPx}px`,
+                                }}
+                              />
+                            );
+                          })()}
 
                         <RenderGroupedEvents
                           groupedEvents={groupedEvents}

@@ -237,14 +237,14 @@ var DragDropContext = createContext2(
 );
 function DndProvider({ children }) {
   const { updateEvent } = useCalendar();
-  const [dragState, setDragState] = useState3({ draggedEvent: null, isDragging: false });
+  const [dragState, setDragState] = useState3({ draggedEvent: null, isDragging: false, dragOffsetY: 0 });
   const [dragPreview, setDragPreview] = useState3(null);
   const onEventDroppedRef = useRef(null);
-  const startDrag = useCallback((event) => {
-    setDragState({ draggedEvent: event, isDragging: true });
+  const startDrag = useCallback((event, offsetY) => {
+    setDragState({ draggedEvent: event, isDragging: true, dragOffsetY: offsetY });
   }, []);
   const endDrag = useCallback(() => {
-    setDragState({ draggedEvent: null, isDragging: false });
+    setDragState({ draggedEvent: null, isDragging: false, dragOffsetY: 0 });
     setDragPreview(null);
   }, []);
   const updateDragPreview = useCallback((preview) => {
@@ -321,6 +321,7 @@ function DndProvider({ children }) {
     () => ({
       draggedEvent: dragState.draggedEvent,
       isDragging: dragState.isDragging,
+      dragOffsetY: dragState.dragOffsetY,
       dragPreview,
       startDrag,
       endDrag,
@@ -2080,7 +2081,9 @@ function DraggableEvent({
         const dragEvent = e;
         dragEvent.dataTransfer.setData("text/plain", event.id.toString());
         dragEvent.dataTransfer.effectAllowed = "move";
-        startDrag(event);
+        const rect = e.currentTarget.getBoundingClientRect();
+        const offsetY = dragEvent.clientY - rect.top;
+        startDrag(event, offsetY);
       },
       onDragEnd: () => {
         endDrag();
@@ -2643,13 +2646,6 @@ function DayViewMultiDayEventsRow({
   ] });
 }
 
-// src/lib/calendar/views/week-and-day-view/render-grouped-events.tsx
-import {
-  areIntervalsOverlapping,
-  differenceInMinutes as differenceInMinutes4,
-  parseISO as parseISO7
-} from "date-fns";
-
 // src/lib/calendar/views/week-and-day-view/event-block.tsx
 import { cva as cva7 } from "class-variance-authority";
 import { differenceInMinutes as differenceInMinutes3, parseISO as parseISO6 } from "date-fns";
@@ -2906,6 +2902,11 @@ function EventBlock({ event, className, eventWidth = 100, eventLeft = 0, zIndex 
 }
 
 // src/lib/calendar/views/week-and-day-view/render-grouped-events.tsx
+import {
+  areIntervalsOverlapping,
+  differenceInMinutes as differenceInMinutes4,
+  parseISO as parseISO7
+} from "date-fns";
 import { jsx as jsx34 } from "react/jsx-runtime";
 function computeEventLayouts(groupedEvents) {
   const allEvents = groupedEvents.flat().sort((a, b) => {
@@ -3029,7 +3030,14 @@ function CalendarDayView({ singleDayEvents, multiDayEvents }) {
     use24HourFormat,
     onRequestAddEvent
   } = useCalendar();
-  const { isDragging, dragPreview, handleEventDrop, updateDragPreview } = useDragDrop();
+  const {
+    isDragging,
+    draggedEvent,
+    dragPreview,
+    dragOffsetY,
+    handleEventDrop,
+    updateDragPreview
+  } = useDragDrop();
   const scrollAreaRef = useRef2(null);
   const gridRef = useRef2(null);
   const calcPositionFromCursor = useCallback4(
@@ -3037,7 +3045,7 @@ function CalendarDayView({ singleDayEvents, multiDayEvents }) {
       const grid = gridRef.current;
       if (!grid) return null;
       const rect = grid.getBoundingClientRect();
-      const y = clientY - rect.top + grid.scrollTop;
+      const y = clientY - rect.top + grid.scrollTop - dragOffsetY;
       const totalMinutes = y / HOUR_HEIGHT * 60;
       const snappedMinutes = Math.floor(totalMinutes / QUARTER_MINUTES) * QUARTER_MINUTES;
       const clampedMinutes = Math.max(0, Math.min(23 * 60 + 45, snappedMinutes));
@@ -3045,7 +3053,7 @@ function CalendarDayView({ singleDayEvents, multiDayEvents }) {
       const minute = clampedMinutes % 60;
       return { date: selectedDate, hour, minute };
     },
-    [selectedDate]
+    [selectedDate, dragOffsetY]
   );
   const handleDragOver = useCallback4(
     (e) => {
@@ -3168,14 +3176,22 @@ function CalendarDayView({ singleDayEvents, multiDayEvents }) {
                   },
                   hour
                 )),
-                isDragging && dragPreview && isSameDay3(dragPreview.date, selectedDate) && /* @__PURE__ */ jsx35(
+                isDragging && draggedEvent && dragPreview && isSameDay3(dragPreview.date, selectedDate) && /* @__PURE__ */ jsx35(
                   "div",
                   {
-                    className: "absolute inset-x-1 rounded-md bg-primary/20 border-2 border-primary/40 pointer-events-none z-30 transition-[top] duration-75",
+                    className: "absolute inset-x-0 pointer-events-none z-30",
                     style: {
-                      top: `${(dragPreview.hour * 60 + dragPreview.minute) / 1440 * 100}%`,
-                      height: "24px"
-                    }
+                      top: `${(dragPreview.hour * 60 + dragPreview.minute) / 1440 * 100}%`
+                    },
+                    children: /* @__PURE__ */ jsx35(
+                      EventBlock,
+                      {
+                        event: draggedEvent,
+                        eventWidth: 100,
+                        eventLeft: 0,
+                        zIndex: 30
+                      }
+                    )
                   }
                 ),
                 /* @__PURE__ */ jsx35(
@@ -3246,7 +3262,7 @@ function CalendarDayView({ singleDayEvents, multiDayEvents }) {
 }
 
 // src/lib/calendar/views/week-and-day-view/calendar-week-view.tsx
-import { addDays as addDays3, format as format5, isSameDay as isSameDay4, parseISO as parseISO10, startOfWeek as startOfWeek3 } from "date-fns";
+import { addDays as addDays3, differenceInMinutes as differenceInMinutes5, format as format5, isSameDay as isSameDay4, parseISO as parseISO10, startOfWeek as startOfWeek3 } from "date-fns";
 import { motion as motion10 } from "framer-motion";
 import { useCallback as useCallback5, useRef as useRef3 } from "react";
 
@@ -3372,7 +3388,7 @@ var HOUR_HEIGHT2 = 96;
 var QUARTER_MINUTES2 = 15;
 function CalendarWeekView({ singleDayEvents, multiDayEvents }) {
   const { selectedDate, use24HourFormat, onRequestAddEvent } = useCalendar();
-  const { isDragging, dragPreview, handleEventDrop, updateDragPreview } = useDragDrop();
+  const { isDragging, draggedEvent, dragPreview, dragOffsetY, handleEventDrop, updateDragPreview } = useDragDrop();
   const gridRef = useRef3(null);
   const weekStart = startOfWeek3(selectedDate);
   const weekDays = Array.from({ length: 7 }, (_, i) => addDays3(weekStart, i));
@@ -3383,7 +3399,7 @@ function CalendarWeekView({ singleDayEvents, multiDayEvents }) {
       if (!grid) return null;
       const rect = grid.getBoundingClientRect();
       const x = clientX - rect.left;
-      const y = clientY - rect.top + grid.scrollTop;
+      const y = clientY - rect.top + grid.scrollTop - dragOffsetY;
       const colWidth = rect.width / 7;
       const dayIndex = Math.max(0, Math.min(6, Math.floor(x / colWidth)));
       const totalMinutes = y / HOUR_HEIGHT2 * 60;
@@ -3393,7 +3409,7 @@ function CalendarWeekView({ singleDayEvents, multiDayEvents }) {
       const minute = clampedMinutes % 60;
       return { date: weekDays[dayIndex], hour, minute };
     },
-    [weekDays]
+    [weekDays, dragOffsetY]
   );
   const handleDragOver = useCallback5(
     (e) => {
@@ -3568,16 +3584,22 @@ function CalendarWeekView({ singleDayEvents, multiDayEvents }) {
                                     },
                                     hour
                                   )),
-                                  isDragging && dragPreview && isSameDay4(dragPreview.date, day) && /* @__PURE__ */ jsx37(
-                                    "div",
-                                    {
-                                      className: "absolute inset-x-1 rounded-md bg-primary/20 border-2 border-primary/40 pointer-events-none z-30 transition-[top] duration-75",
-                                      style: {
-                                        top: `${(dragPreview.hour * 60 + dragPreview.minute) / 1440 * 100}%`,
-                                        height: "24px"
+                                  isDragging && draggedEvent && dragPreview && isSameDay4(dragPreview.date, day) && (() => {
+                                    const evtStart = parseISO10(draggedEvent.startDate);
+                                    const evtEnd = parseISO10(draggedEvent.endDate);
+                                    const durationMin = differenceInMinutes5(evtEnd, evtStart);
+                                    const heightPx = durationMin / 60 * HOUR_HEIGHT2;
+                                    return /* @__PURE__ */ jsx37(
+                                      "div",
+                                      {
+                                        className: "absolute inset-x-1 rounded-md bg-primary/20 border-2 border-primary/40 pointer-events-none z-30 transition-[top] duration-75",
+                                        style: {
+                                          top: `${(dragPreview.hour * 60 + dragPreview.minute) / 1440 * 100}%`,
+                                          height: `${heightPx}px`
+                                        }
                                       }
-                                    }
-                                  ),
+                                    );
+                                  })(),
                                   /* @__PURE__ */ jsx37(
                                     RenderGroupedEvents,
                                     {

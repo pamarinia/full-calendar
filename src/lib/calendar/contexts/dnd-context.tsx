@@ -23,7 +23,8 @@ interface DragDropContextType {
   draggedEvent: IEvent | null;
   isDragging: boolean;
   dragPreview: DragPreview | null;
-  startDrag: (event: IEvent) => void;
+  dragOffsetY: number;
+  startDrag: (event: IEvent, offsetY: number) => void;
   endDrag: () => void;
   handleEventDrop: (date: Date, hour?: number, minute?: number) => void;
   updateDragPreview: (preview: DragPreview | null) => void;
@@ -42,19 +43,20 @@ export function DndProvider({ children }: DndProviderProps) {
   const [dragState, setDragState] = useState<{
     draggedEvent: IEvent | null;
     isDragging: boolean;
-  }>({ draggedEvent: null, isDragging: false });
+    dragOffsetY: number;
+  }>({ draggedEvent: null, isDragging: false, dragOffsetY: 0 });
   const [dragPreview, setDragPreview] = useState<DragPreview | null>(null);
 
   const onEventDroppedRef = useRef<
     ((event: IEvent, newStartDate: Date, newEndDate: Date) => void) | null
   >(null);
 
-  const startDrag = useCallback((event: IEvent) => {
-    setDragState({ draggedEvent: event, isDragging: true });
+  const startDrag = useCallback((event: IEvent, offsetY: number) => {
+    setDragState({ draggedEvent: event, isDragging: true, dragOffsetY: offsetY });
   }, []);
 
   const endDrag = useCallback(() => {
-    setDragState({ draggedEvent: null, isDragging: false });
+    setDragState({ draggedEvent: null, isDragging: false, dragOffsetY: 0 });
     setDragPreview(null);
   }, []);
 
@@ -144,6 +146,7 @@ export function DndProvider({ children }: DndProviderProps) {
     () => ({
       draggedEvent: dragState.draggedEvent,
       isDragging: dragState.isDragging,
+      dragOffsetY: dragState.dragOffsetY,
       dragPreview,
       startDrag,
       endDrag,

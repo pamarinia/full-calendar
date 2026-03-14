@@ -34,7 +34,9 @@ export function DraggableEvent({
         const dragEvent = e as unknown as DragEvent;
         dragEvent.dataTransfer!.setData("text/plain", event.id.toString());
         dragEvent.dataTransfer!.effectAllowed = "move";
-        startDrag(event);
+        const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+        const offsetY = dragEvent.clientY - rect.top;
+        startDrag(event, offsetY);
       }}
       onDragEnd={() => {
         endDrag();

@@ -9,6 +9,7 @@ import { groupEvents } from "../../helpers";
 import type { IEvent } from "../../interfaces";
 import { CalendarTimeline } from "../../views/week-and-day-view/calendar-time-line";
 import { DayViewMultiDayEventsRow } from "../../views/week-and-day-view/day-view-multi-day-events-row";
+import { EventBlock } from "../../views/week-and-day-view/event-block";
 import { RenderGroupedEvents } from "../../views/week-and-day-view/render-grouped-events";
 
 interface IProps {
@@ -27,8 +28,14 @@ export function CalendarDayView({ singleDayEvents, multiDayEvents }: IProps) {
     use24HourFormat,
     onRequestAddEvent,
   } = useCalendar();
-  const { isDragging, dragPreview, handleEventDrop, updateDragPreview } =
-    useDragDrop();
+  const {
+    isDragging,
+    draggedEvent,
+    dragPreview,
+    dragOffsetY,
+    handleEventDrop,
+    updateDragPreview,
+  } = useDragDrop();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
 
@@ -38,7 +45,7 @@ export function CalendarDayView({ singleDayEvents, multiDayEvents }: IProps) {
       if (!grid) return null;
 
       const rect = grid.getBoundingClientRect();
-      const y = clientY - rect.top + grid.scrollTop;
+      const y = clientY - rect.top + grid.scrollTop - dragOffsetY;
 
       const totalMinutes = (y / HOUR_HEIGHT) * 60;
       const snappedMinutes =
@@ -50,7 +57,7 @@ export function CalendarDayView({ singleDayEvents, multiDayEvents }: IProps) {
 
       return { date: selectedDate, hour, minute };
     },
-    [selectedDate]
+    [selectedDate, dragOffsetY]
   );
 
   const handleDragOver = useCallback(
@@ -216,17 +223,24 @@ export function CalendarDayView({ singleDayEvents, multiDayEvents }: IProps) {
                   </div>
                 ))}
 
-                {/* Drag preview indicator */}
+                {/* Drag preview: render the dragged event at preview position */}
                 {isDragging &&
+                  draggedEvent &&
                   dragPreview &&
                   isSameDay(dragPreview.date, selectedDate) && (
                     <div
-                      className="absolute inset-x-1 rounded-md bg-primary/20 border-2 border-primary/40 pointer-events-none z-30 transition-[top] duration-75"
+                      className="absolute inset-x-0 pointer-events-none z-30"
                       style={{
                         top: `${((dragPreview.hour * 60 + dragPreview.minute) / 1440) * 100}%`,
-                        height: "24px",
                       }}
-                    />
+                    >
+                      <EventBlock
+                        event={draggedEvent}
+                        eventWidth={100}
+                        eventLeft={0}
+                        zIndex={30}
+                      />
+                    </div>
                   )}
 
                 <RenderGroupedEvents
