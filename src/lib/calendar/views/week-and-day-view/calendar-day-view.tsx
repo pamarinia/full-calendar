@@ -1,10 +1,10 @@
-import { format, isWithinInterval, parseISO } from "date-fns";
+import { format, isSameDay, isWithinInterval, parseISO } from "date-fns";
 import { Calendar, Clock, User } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { DayPicker } from "../../../components/ui/day-picker";
 import { ScrollArea } from "../../../components/ui/scroll-area";
 import { useCalendar } from "../../contexts/calendar-context";
-import { DroppableArea } from "../../dnd/droppable-area";
+import { useDragDrop } from "../../contexts/dnd-context";
 import { groupEvents } from "../../helpers";
 import type { IEvent } from "../../interfaces";
 import { CalendarTimeline } from "../../views/week-and-day-view/calendar-time-line";
@@ -16,6 +16,9 @@ interface IProps {
   multiDayEvents: IEvent[];
 }
 
+const HOUR_HEIGHT = 96;
+const QUARTER_MINUTES = 15;
+
 export function CalendarDayView({ singleDayEvents, multiDayEvents }: IProps) {
   const {
     selectedDate,
@@ -24,7 +27,58 @@ export function CalendarDayView({ singleDayEvents, multiDayEvents }: IProps) {
     use24HourFormat,
     onRequestAddEvent,
   } = useCalendar();
+  const { isDragging, dragPreview, handleEventDrop, updateDragPreview } =
+    useDragDrop();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
+
+  const calcPositionFromCursor = useCallback(
+    (_clientX: number, clientY: number) => {
+      const grid = gridRef.current;
+      if (!grid) return null;
+
+      const rect = grid.getBoundingClientRect();
+      const y = clientY - rect.top + grid.scrollTop;
+
+      const totalMinutes = (y / HOUR_HEIGHT) * 60;
+      const snappedMinutes =
+        Math.floor(totalMinutes / QUARTER_MINUTES) * QUARTER_MINUTES;
+      const clampedMinutes = Math.max(0, Math.min(23 * 60 + 45, snappedMinutes));
+
+      const hour = Math.floor(clampedMinutes / 60);
+      const minute = clampedMinutes % 60;
+
+      return { date: selectedDate, hour, minute };
+    },
+    [selectedDate]
+  );
+
+  const handleDragOver = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      const pos = calcPositionFromCursor(e.clientX, e.clientY);
+      if (pos) updateDragPreview(pos);
+    },
+    [calcPositionFromCursor, updateDragPreview]
+  );
+
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      const pos = calcPositionFromCursor(e.clientX, e.clientY);
+      if (pos) handleEventDrop(pos.date, pos.hour, pos.minute);
+    },
+    [calcPositionFromCursor, handleEventDrop]
+  );
+
+  const handleDragLeave = useCallback(
+    (e: React.DragEvent) => {
+      if (!gridRef.current?.contains(e.relatedTarget as Node)) {
+        updateDragPreview(null);
+      }
+    },
+    [updateDragPreview]
+  );
 
   const hours = Array.from({ length: 24 }, (_, i) => i);
 
@@ -124,7 +178,13 @@ export function CalendarDayView({ singleDayEvents, multiDayEvents }: IProps) {
 
             {/* Day grid */}
             <div className="relative flex-1 border-l">
-              <div className="relative">
+              <div
+                ref={gridRef}
+                className="relative"
+                onDragOver={handleDragOver}
+                onDrop={handleDrop}
+                onDragLeave={handleDragLeave}
+              >
                 {hours.map((hour, index) => (
                   <div
                     key={hour}
@@ -135,43 +195,39 @@ export function CalendarDayView({ singleDayEvents, multiDayEvents }: IProps) {
                       <div className="pointer-events-none absolute inset-x-0 top-0 border-b"></div>
                     )}
 
-                    <DroppableArea
-                      date={selectedDate}
-                      hour={hour}
-                      minute={0}
-                      className="absolute inset-x-0 top-0 h-[48px]"
-                    >
+                    {[0, 15, 30, 45].map((minute) => (
                       <div
-                        className="absolute inset-0 cursor-pointer transition-colors hover:bg-secondary"
+                        key={minute}
+                        className="absolute inset-x-0 cursor-pointer transition-colors hover:bg-secondary"
+                        style={{
+                          top: `${(minute / 60) * 100}%`,
+                          height: "25%",
+                        }}
                         onClick={() =>
                           onRequestAddEvent?.({
                             startDate: selectedDate,
-                            startTime: { hour, minute: 0 },
+                            startTime: { hour, minute },
                           })
                         }
                       />
-                    </DroppableArea>
+                    ))}
 
                     <div className="pointer-events-none absolute inset-x-0 top-1/2 border-b border-dashed border-b-tertiary"></div>
-
-                    <DroppableArea
-                      date={selectedDate}
-                      hour={hour}
-                      minute={30}
-                      className="absolute inset-x-0 bottom-0 h-[48px]"
-                    >
-                      <div
-                        className="absolute inset-0 cursor-pointer transition-colors hover:bg-secondary"
-                        onClick={() =>
-                          onRequestAddEvent?.({
-                            startDate: selectedDate,
-                            startTime: { hour, minute: 30 },
-                          })
-                        }
-                      />
-                    </DroppableArea>
                   </div>
                 ))}
+
+                {/* Drag preview indicator */}
+                {isDragging &&
+                  dragPreview &&
+                  isSameDay(dragPreview.date, selectedDate) && (
+                    <div
+                      className="absolute inset-x-1 rounded-md bg-primary/20 border-2 border-primary/40 pointer-events-none z-30 transition-[top] duration-75"
+                      style={{
+                        top: `${((dragPreview.hour * 60 + dragPreview.minute) / 1440) * 100}%`,
+                        height: "24px",
+                      }}
+                    />
+                  )}
 
                 <RenderGroupedEvents
                   groupedEvents={groupedEvents}

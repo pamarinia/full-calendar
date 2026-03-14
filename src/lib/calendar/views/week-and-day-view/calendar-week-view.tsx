@@ -1,26 +1,90 @@
 import { addDays, format, isSameDay, parseISO, startOfWeek } from "date-fns";
 import { motion } from "framer-motion";
+import { useCallback, useRef } from "react";
 import { fadeIn, staggerContainer, transition } from "../../animations";
 import { useCalendar } from "../../contexts/calendar-context";
-import { DroppableArea } from "../../dnd/droppable-area";
+import { useDragDrop } from "../../contexts/dnd-context";
 import { groupEvents } from "../../helpers";
 import type { IEvent } from "../../interfaces";
 import { CalendarTimeline } from "../../views/week-and-day-view/calendar-time-line";
 import { RenderGroupedEvents } from "../../views/week-and-day-view/render-grouped-events";
 import { WeekViewMultiDayEventsRow } from "../../views/week-and-day-view/week-view-multi-day-events-row";
-import { AlertCircleIcon } from "lucide-react";
 
 interface IProps {
   singleDayEvents: IEvent[];
   multiDayEvents: IEvent[];
 }
 
+const HOUR_HEIGHT = 96;
+const QUARTER_MINUTES = 15;
+
 export function CalendarWeekView({ singleDayEvents, multiDayEvents }: IProps) {
   const { selectedDate, use24HourFormat, onRequestAddEvent } = useCalendar();
+  const { isDragging, dragPreview, handleEventDrop, updateDragPreview } =
+    useDragDrop();
+
+  const gridRef = useRef<HTMLDivElement>(null);
 
   const weekStart = startOfWeek(selectedDate);
   const weekDays = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
   const hours = Array.from({ length: 24 }, (_, i) => i);
+
+  const calcPositionFromCursor = useCallback(
+    (clientX: number, clientY: number) => {
+      const grid = gridRef.current;
+      if (!grid) return null;
+
+      const rect = grid.getBoundingClientRect();
+      const x = clientX - rect.left;
+      const y = clientY - rect.top + grid.scrollTop;
+
+      const colWidth = rect.width / 7;
+      const dayIndex = Math.max(0, Math.min(6, Math.floor(x / colWidth)));
+
+      const totalMinutes = (y / HOUR_HEIGHT) * 60;
+      const snappedMinutes =
+        Math.floor(totalMinutes / QUARTER_MINUTES) * QUARTER_MINUTES;
+      const clampedMinutes = Math.max(0, Math.min(23 * 60 + 45, snappedMinutes));
+
+      const hour = Math.floor(clampedMinutes / 60);
+      const minute = clampedMinutes % 60;
+
+      return { date: weekDays[dayIndex], hour, minute };
+    },
+    [weekDays]
+  );
+
+  const handleDragOver = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      const pos = calcPositionFromCursor(e.clientX, e.clientY);
+      if (pos) {
+        updateDragPreview(pos);
+      }
+    },
+    [calcPositionFromCursor, updateDragPreview]
+  );
+
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      const pos = calcPositionFromCursor(e.clientX, e.clientY);
+      if (pos) {
+        handleEventDrop(pos.date, pos.hour, pos.minute);
+      }
+    },
+    [calcPositionFromCursor, handleEventDrop]
+  );
+
+  const handleDragLeave = useCallback(
+    (e: React.DragEvent) => {
+      // Only clear preview if leaving the grid entirely
+      if (!gridRef.current?.contains(e.relatedTarget as Node)) {
+        updateDragPreview(null);
+      }
+    },
+    [updateDragPreview]
+  );
 
   return (
     <motion.div
@@ -58,7 +122,6 @@ export function CalendarWeekView({ singleDayEvents, multiDayEvents }: IProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={transition}
           >
-            {/* Time column header - responsive width */}
             <div className="w-18"></div>
             <div className="grid flex-1 grid-cols-7  border-l">
               {weekDays.map((day, index) => (
@@ -69,14 +132,12 @@ export function CalendarWeekView({ singleDayEvents, multiDayEvents }: IProps) {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.05, ...transition }}
                 >
-                  {/* Mobile: Show only day abbreviation and number */}
                   <span className="block sm:hidden">
                     {format(day, "EEE").charAt(0)}
                     <span className="block font-semibold text-t-secondary text-xs">
                       {format(day, "d")}
                     </span>
                   </span>
-                  {/* Desktop: Show full format */}
                   <span className="hidden sm:inline">
                     {format(day, "EE")}{" "}
                     <span className="ml-1 font-semibold text-t-secondary">
@@ -121,7 +182,13 @@ export function CalendarWeekView({ singleDayEvents, multiDayEvents }: IProps) {
                 className="relative flex-1 border-l"
                 variants={staggerContainer}
               >
-                <div className="grid grid-cols-7 divide-x">
+                <div
+                  ref={gridRef}
+                  className="grid grid-cols-7 divide-x"
+                  onDragOver={handleDragOver}
+                  onDrop={handleDrop}
+                  onDragLeave={handleDragLeave}
+                >
                   {weekDays.map((day, dayIndex) => {
                     const dayEvents = singleDayEvents.filter(
                       (event) =>
@@ -133,7 +200,7 @@ export function CalendarWeekView({ singleDayEvents, multiDayEvents }: IProps) {
                     return (
                       <motion.div
                         key={day.toISOString()}
-                        className="relative"
+                        className="relative overflow-hidden"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: dayIndex * 0.1, ...transition }}
@@ -151,43 +218,40 @@ export function CalendarWeekView({ singleDayEvents, multiDayEvents }: IProps) {
                               <div className="pointer-events-none absolute inset-x-0 top-0 border-b"></div>
                             )}
 
-                            <DroppableArea
-                              date={day}
-                              hour={hour}
-                              minute={0}
-                              className="absolute inset-x-0 top-0  h-[48px]"
-                            >
+                            {/* Click zones for adding events */}
+                            {[0, 15, 30, 45].map((minute) => (
                               <div
-                                className="absolute inset-0 cursor-pointer transition-colors hover:bg-secondary"
+                                key={minute}
+                                className="absolute inset-x-0 cursor-pointer transition-colors hover:bg-secondary"
+                                style={{
+                                  top: `${(minute / 60) * 100}%`,
+                                  height: "25%",
+                                }}
                                 onClick={() =>
                                   onRequestAddEvent?.({
                                     startDate: day,
-                                    startTime: { hour, minute: 0 },
+                                    startTime: { hour, minute },
                                   })
                                 }
                               />
-                            </DroppableArea>
+                            ))}
 
                             <div className="pointer-events-none absolute inset-x-0 top-1/2 border-b border-dashed border-b-tertiary"></div>
-
-                            <DroppableArea
-                              date={day}
-                              hour={hour}
-                              minute={30}
-                              className="absolute inset-x-0 bottom-0 h-[48px]"
-                            >
-                              <div
-                                className="absolute inset-0 cursor-pointer transition-colors hover:bg-secondary"
-                                onClick={() =>
-                                  onRequestAddEvent?.({
-                                    startDate: day,
-                                    startTime: { hour, minute: 30 },
-                                  })
-                                }
-                              />
-                            </DroppableArea>
                           </motion.div>
                         ))}
+
+                        {/* Drag preview indicator */}
+                        {isDragging &&
+                          dragPreview &&
+                          isSameDay(dragPreview.date, day) && (
+                            <div
+                              className="absolute inset-x-1 rounded-md bg-primary/20 border-2 border-primary/40 pointer-events-none z-30 transition-[top] duration-75"
+                              style={{
+                                top: `${((dragPreview.hour * 60 + dragPreview.minute) / 1440) * 100}%`,
+                                height: "24px",
+                              }}
+                            />
+                          )}
 
                         <RenderGroupedEvents
                           groupedEvents={groupedEvents}

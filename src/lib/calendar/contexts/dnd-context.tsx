@@ -13,12 +13,20 @@ import { toast } from "sonner";
 import { useCalendar } from "./calendar-context";
 import { IEvent } from "../interfaces";
 
+interface DragPreview {
+  date: Date;
+  hour: number;
+  minute: number;
+}
+
 interface DragDropContextType {
   draggedEvent: IEvent | null;
   isDragging: boolean;
+  dragPreview: DragPreview | null;
   startDrag: (event: IEvent) => void;
   endDrag: () => void;
   handleEventDrop: (date: Date, hour?: number, minute?: number) => void;
+  updateDragPreview: (preview: DragPreview | null) => void;
 }
 
 interface DndProviderProps {
@@ -35,6 +43,7 @@ export function DndProvider({ children }: DndProviderProps) {
     draggedEvent: IEvent | null;
     isDragging: boolean;
   }>({ draggedEvent: null, isDragging: false });
+  const [dragPreview, setDragPreview] = useState<DragPreview | null>(null);
 
   const onEventDroppedRef = useRef<
     ((event: IEvent, newStartDate: Date, newEndDate: Date) => void) | null
@@ -46,6 +55,11 @@ export function DndProvider({ children }: DndProviderProps) {
 
   const endDrag = useCallback(() => {
     setDragState({ draggedEvent: null, isDragging: false });
+    setDragPreview(null);
+  }, []);
+
+  const updateDragPreview = useCallback((preview: DragPreview | null) => {
+    setDragPreview(preview);
   }, []);
 
   const calculateNewDates = useCallback(
@@ -91,13 +105,11 @@ export function DndProvider({ children }: DndProviderProps) {
       );
       const originalStart = new Date(draggedEvent.startDate);
 
-      // Check if dropped in same position
       if (isSamePosition(originalStart, newStart)) {
         endDrag();
         return;
       }
 
-      // Instantly update event
       const callback = onEventDroppedRef.current;
       if (callback) {
         callback(draggedEvent, newStart, newEnd);
@@ -107,7 +119,6 @@ export function DndProvider({ children }: DndProviderProps) {
     [dragState, calculateNewDates, isSamePosition, endDrag]
   );
 
-  // Default event update handler
   const handleEventUpdate = useCallback(
     (event: IEvent, newStartDate: Date, newEndDate: Date) => {
       try {
@@ -125,7 +136,6 @@ export function DndProvider({ children }: DndProviderProps) {
     [updateEvent]
   );
 
-  // Set default callback
   React.useEffect(() => {
     onEventDroppedRef.current = handleEventUpdate;
   }, [handleEventUpdate]);
@@ -134,11 +144,13 @@ export function DndProvider({ children }: DndProviderProps) {
     () => ({
       draggedEvent: dragState.draggedEvent,
       isDragging: dragState.isDragging,
+      dragPreview,
       startDrag,
       endDrag,
       handleEventDrop,
+      updateDragPreview,
     }),
-    [dragState, startDrag, endDrag, handleEventDrop]
+    [dragState, dragPreview, startDrag, endDrag, handleEventDrop, updateDragPreview]
   );
 
   return (

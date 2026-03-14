@@ -10,7 +10,7 @@ import { formatTime } from "../../helpers";
 import type { IEvent } from "../../interfaces";
 
 const calendarWeekEventCardVariants = cva(
-  "flex select-none flex-col gap-0.5 truncate whitespace-nowrap rounded-md border px-2 py-1.5 text-xs focus-visible:outline-offset-2",
+  "flex select-none flex-col gap-0.5 overflow-hidden rounded-md border px-2 py-1.5 text-xs focus-visible:outline-offset-2",
   {
     variants: {
       color: {
@@ -51,9 +51,12 @@ interface IProps
   extends HTMLAttributes<HTMLDivElement>,
     Omit<VariantProps<typeof calendarWeekEventCardVariants>, "color"> {
   event: IEvent;
+  eventWidth?: number;
+  eventLeft?: number;
+  zIndex?: number;
 }
 
-export function EventBlock({ event, className }: IProps) {
+export function EventBlock({ event, className, eventWidth = 100, eventLeft = 0, zIndex = 0 }: IProps) {
   const { badgeVariant, use24HourFormat, onRequestShowEvent } = useCalendar();
 
   const start = parseISO(event.startDate);
@@ -67,8 +70,14 @@ export function EventBlock({ event, className }: IProps) {
 
   const calendarWeekEventCardClasses = cn(
     calendarWeekEventCardVariants({ color, className }),
-    durationInMinutes < 35 && "py-0 justify-center"
+    durationInMinutes < 35 && "py-0 justify-center",
+    "pointer-events-auto"
   );
+
+  const showTime = durationInMinutes > 25;
+  const verticalPadding = durationInMinutes < 35 ? 0 : 12;
+  const timeRowHeight = showTime ? 16 : 0;
+  const maxTitleLines = Math.max(1, Math.floor((heightInPixels - verticalPadding - timeRowHeight - 2) / 16));
 
   return (
     <ResizableEvent event={event}>
@@ -76,28 +85,44 @@ export function EventBlock({ event, className }: IProps) {
           <button
             type="button"
             className={calendarWeekEventCardClasses}
-            style={{ height: `${heightInPixels}px` }}
+            style={{
+              height: `${heightInPixels}px`,
+              width: `${eventWidth}%`,
+              marginLeft: `${eventLeft}%`,
+              position: "relative",
+              zIndex,
+            }}
             onClick={() => onRequestShowEvent?.({ event })}
           >
-            <div className="flex items-center gap-1.5 truncate">
+            <div className="flex items-start gap-1.5 overflow-hidden">
               {badgeVariant === "dot" && (
                 <svg
                   width="8"
                   height="8"
                   viewBox="0 0 8 8"
                   xmlns="http://www.w3.org/2000/svg"
-                  className="shrink-0"
+                  className="shrink-0 mt-[3px]"
                   aria-hidden="true"
                 >
                   <circle cx="4" cy="4" r="4" />
                 </svg>
               )}
 
-              <p className="truncate font-semibold">{event.title}</p>
+              <p
+                className="font-semibold break-words min-w-0"
+                style={{
+                  display: "-webkit-box",
+                  WebkitLineClamp: maxTitleLines,
+                  WebkitBoxOrient: "vertical",
+                  overflow: "hidden",
+                }}
+              >
+                {event.title}
+              </p>
             </div>
 
-            {durationInMinutes > 25 && (
-              <p>
+            {showTime && (
+              <p className="shrink-0 truncate">
                 {formatTime(start, use24HourFormat)} -{" "}
                 {formatTime(end, use24HourFormat)}
               </p>

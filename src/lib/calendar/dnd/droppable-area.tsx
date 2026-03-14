@@ -7,6 +7,7 @@ interface DroppableAreaProps {
   minute?: number;
   children: ReactNode;
   className?: string;
+  style?: React.CSSProperties;
 }
 
 export function DroppableArea({
@@ -15,6 +16,7 @@ export function DroppableArea({
   minute,
   children,
   className,
+  style,
 }: DroppableAreaProps) {
   const { handleEventDrop, isDragging } = useDragDrop();
 
@@ -24,6 +26,7 @@ export function DroppableArea({
       role="gridcell"
       aria-label="Droppable area"
       tabIndex={-1}
+      style={style}
       className={`${className || ""} ${isDragging ? "drop-target" : ""}`}
       onDragOver={(e) => {
         // Prevent default to allow drop

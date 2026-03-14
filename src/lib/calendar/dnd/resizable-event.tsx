@@ -115,6 +115,8 @@ export function ResizableEvent({
 
   const resizeConfig = useMemo(
     () => ({
+      defaultSize: { width: "100%" },
+      maxWidth: "100%",
       minHeight: 15,
       maxHeight: 1440,
       enable: {
@@ -160,7 +162,7 @@ export function ResizableEvent({
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.95 }}
       transition={{ duration: 0.2 }}
-      className={cn("relative group", className)}
+      className={cn("relative group w-full pointer-events-auto", className)}
     >
       <Resizable {...resizeConfig}>{children}</Resizable>
 

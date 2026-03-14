@@ -131,8 +131,6 @@ export function groupEvents(dayEvents: IEvent[]): IEvent[][] {
 export function getEventBlockStyle(
 	event: IEvent,
 	day: Date,
-	groupIndex: number,
-	groupSize: number,
 ) {
 	const startDate = parseISO(event.startDate);
 	const dayStart = startOfDay(day); // Use startOfDay instead of manual reset
@@ -140,10 +138,8 @@ export function getEventBlockStyle(
 	const startMinutes = differenceInMinutes(eventStart, dayStart);
 
 	const top = (startMinutes / 1440) * 100; // 1440 minutes in a day
-	const width = 100 / groupSize;
-	const left = groupIndex * width;
 
-	return { top: `${top}%`, width: `${width}%`, left: `${left}%` };
+	return { top: `${top}%` };
 }
 
 export function getCalendarCells(selectedDate: Date): ICalendarCell[] {
